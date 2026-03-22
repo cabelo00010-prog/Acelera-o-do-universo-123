@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aceleração da Expansão do Universo</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #020409;
+  --glass: rgba(4,6,18,0.72);
+  --glass2: rgba(2,4,12,0.85);
+  --c1: #7ecfff;
+  --c2: #c8aaff;
+  --c3: #ff8c72;
+  --c4: #ffe066;
+  --muted: #8899aa;
+  --text: #dce8f5;
+}
+
+html, body { width: 100%; min-height: 100vh; background: var(--ink); }
+
+#cosmos { position: fixed; inset: 0; z-index: 0; }
+
+#grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+.poster {
+  position: relative; z-index: 2;
+  max-width: 960px; margin: 0 auto;
+  padding: 60px 36px 72px;
+  color: var(--text); font-family: 'Libre Baskerville', serif;
+}
+
+.eyebrow {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.42em; color: var(--c1); text-align: center;
+  text-transform: uppercase; opacity: 0.75; margin-bottom: 18px;
+  animation: fadein 1.2s ease both;
+}
+
+h1 {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(2rem, 5.5vw, 3.6rem); text-align: center;
+  line-height: 1.08; letter-spacing: -0.01em;
+  background: linear-gradient(160deg, #ffffff 0%, var(--c1) 38%, var(--c2) 72%, var(--c3) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 16px; animation: fadein 1.2s ease both 0.1s;
+}
+
+.subtitle {
+  font-style: italic; font-size: 0.96rem; color: var(--muted);
+  text-align: center; max-width: 560px; margin: 0 auto 10px;
+  line-height: 1.8; animation: fadein 1.2s ease both 0.2s;
+}
+
+.rule {
+  width: 200px; height: 1px; margin: 24px auto 52px;
+  background: linear-gradient(to right, transparent, var(--c1), var(--c2), var(--c3), transparent);
+  animation: fadein 1.2s ease both 0.3s;
+}
+
+.diagram-wrap {
+  display: flex; justify-content: center; margin-bottom: 56px;
+  animation: fadein 1.4s ease both 0.4s;
+}
+#diagram {
+  border-radius: 16px; border: 1px solid rgba(126,207,255,0.12);
+  box-shadow: 0 0 80px rgba(79,130,200,0.18), 0 0 160px rgba(100,60,200,0.1);
+  max-width: 100%;
+}
+
+.sec-label {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.38em; color: var(--c2); text-align: center;
+  text-transform: uppercase; margin-bottom: 24px; opacity: 0.7;
+}
+
+.grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 48px;
+}
+@media (max-width: 620px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+.card {
+  background: var(--glass); border: 1px solid rgba(126,207,255,0.1);
+  border-radius: 14px; padding: 22px 18px 20px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.35s cubic-bezier(.22,.8,.44,1), border-color 0.35s, box-shadow 0.35s;
+  animation: slideup 0.7s ease both;
+}
+.card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 14px;
+  background: radial-gradient(ellipse at top left, rgba(126,207,255,0.04), transparent 60%);
+  pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(126,207,255,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(126,207,255,0.1);
+}
+.card-bar { position: absolute; top:0;left:0;right:0; height:2px; border-radius:14px 14px 0 0; }
+.b1{background:linear-gradient(to right,transparent,#7ecfff,transparent)}
+.b2{background:linear-gradient(to right,transparent,#c8aaff,transparent)}
+.b3{background:linear-gradient(to right,transparent,#ff8c72,transparent)}
+.b4{background:linear-gradient(to right,transparent,#ffe066,transparent)}
+
+.card-icon { font-size: 1.4rem; display: block; margin-bottom: 10px; }
+.card-cat {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;
+}
+.c1t{color:var(--c1)}.c2t{color:var(--c2)}.c3t{color:var(--c3)}.c4t{color:var(--c4)}
+
+.card-term {
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  font-size: clamp(0.78rem, 1.8vw, 0.95rem); color: #fff;
+  margin-bottom: 10px; line-height: 1.3;
+}
+.card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.7; }
+.formula {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.74rem;
+  color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.04);
+  border-radius: 6px; padding: 5px 10px; display: inline-block; margin-top: 10px;
+}
+
+.card:nth-child(1){animation-delay:0.05s}.card:nth-child(2){animation-delay:0.12s}
+.card:nth-child(3){animation-delay:0.19s}.card:nth-child(4){animation-delay:0.26s}
+.card:nth-child(5){animation-delay:0.33s}.card:nth-child(6){animation-delay:0.40s}
+.card:nth-child(7){animation-delay:0.47s}.card:nth-child(8){animation-delay:0.54s}
+.card:nth-child(9){animation-delay:0.61s}
+
+.timeline-wrap { margin-bottom: 48px; animation: fadein 1s ease both 0.5s; }
+.tl-track {
+  position: relative; display: flex; align-items: flex-start;
+  justify-content: space-between; padding: 0 4px;
+}
+.tl-track::before {
+  content:''; position: absolute; top:13px; left:4px; right:4px; height:1px;
+  background: linear-gradient(to right, var(--c3), var(--c2) 50%, var(--c1)); opacity:0.5;
+}
+.tl-node { flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; }
+.tl-dot {
+  width:13px; height:13px; border-radius:50%;
+  background:var(--ink); border:2px solid; position:relative; z-index:1; flex-shrink:0;
+}
+.d1{border-color:var(--c3);box-shadow:0 0 10px var(--c3)}
+.d2{border-color:var(--c3);box-shadow:0 0 10px var(--c3)}
+.d3{border-color:var(--c2);box-shadow:0 0 10px var(--c2)}
+.d4{border-color:var(--c1);box-shadow:0 0 8px var(--c1)}
+.d5{border-color:var(--c1);box-shadow:0 0 8px var(--c1)}
+.tl-epoch { font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:var(--muted); line-height:1.5; }
+.tl-name { font-size:0.72rem; font-weight:700; color:var(--text); line-height:1.4; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  overflow: hidden; border-radius: 14px;
+  border: 1px solid rgba(126,207,255,0.12); margin-bottom: 48px;
+  animation: fadein 1s ease both 0.7s;
+}
+.stat {
+  padding: 20px 12px; text-align: center; background: var(--glass2);
+  border-right: 1px solid rgba(126,207,255,0.08);
+}
+.stat:last-child{border-right:none}
+.stat-n {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:clamp(1rem,2.4vw,1.45rem); color:var(--c1); margin-bottom:6px; line-height:1;
+}
+.stat-l { font-size:0.66rem; color:var(--muted); font-style:italic; line-height:1.5; }
+
+footer {
+  text-align:center; font-family:'Share Tech Mono',monospace; font-size:0.58rem;
+  letter-spacing:0.28em; color:rgba(136,153,170,0.35); text-transform:uppercase;
+  animation:fadein 1s ease both 0.9s;
+}
+
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slideup{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<canvas id="cosmos"></canvas>
+<div id="grain"></div>
+
+<div class="poster">
+  <p class="eyebrow">Cosmologia · Astrofísica · Física Teórica</p>
+  <h1>Aceleração da<br>Expansão do Universo</h1>
+  <p class="subtitle">O universo não só se expande — expande-se cada vez mais depressa. Uma força misteriosa atravessa o cosmos, empurrando as galáxias para além do alcance eterno da luz.</p>
+  <div class="rule"></div>
+
+  <div class="diagram-wrap">
+    <canvas id="diagram" width="780" height="200"></canvas>
+  </div>
+
+  <p class="sec-label">▸ Conceitos Fundamentais</p>
+  <div class="grid">
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🌌</span><div class="card-cat c1t">Descoberta · 1998</div><div class="card-term">Expansão Acelerada</div><div class="card-desc">Descoberta por Perlmutter, Schmidt e Riess ao estudar supernovas Tipo Ia distantes. O ritmo de expansão do universo está a aumentar. Premiados com o Nobel em 2011.</div></div>
+    <div class="card"><div class="card-bar b2"></div><span class="card-icon">⚫</span><div class="card-cat c2t">Causa Provável</div><div class="card-term">Energia Escura</div><div class="card-desc">Componente desconhecida que constitui ~68% da energia total do universo. Age como pressão negativa que contraria a gravidade e acelera a expansão.</div></div>
+    <div class="card"><div class="card-bar b3"></div><span class="card-icon">💥</span><div class="card-cat c3t">Vela-Padrão</div><div class="card-term">Supernova Tipo Ia</div><div class="card-desc">Explosões termonucleares de luminosidade intrínseca previsível. Permitiram medir distâncias cósmicas com precisão e detetaram o afastamento anómalo das galáxias.</div></div>
+    <div class="card"><div class="card-bar b4"></div><span class="card-icon">📐</span><div class="card-cat c4t">Lei Fundamental</div><div class="card-term">Lei de Hubble-Lemaître</div><div class="card-desc">Galáxias afastam-se proporcionalmente à sua distância. A expansão não é explosão — é o próprio espaço-tempo a dilatar-se em todas as direções.</div><div class="formula">v = H₀ · d</div></div>
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🔢</span><div class="card-cat c1t">Parâmetro Central</div><div class="card-term">Constante de Hubble H₀</div><div class="card-desc">Taxa de expansão do universo: ~70 km/s/Mpc. A "Tensão de Hubble" — discrepância entre medições — é um dos maiores mistérios da cosmologia moderna.</div></div>
+    <div class="card"><div class="card-bar b2"></div><span class="card-icon">λ</span><div class="card-cat c2t">Equação de Einstein</div><div class="card-term">Constante Cosmológica Λ</div><div class="card-desc">Termo nas equações de campo da relatividade geral. Einstein introduziu-o para um universo estático; hoje é a candidata mais simples à energia escura.</div><div class="formula">Gμν + Λgμν = 8πTμν</div></div>
+    <div class="card"><div class="card-bar b3"></div><span class="card-icon">🌀</span><div class="card-cat c3t">Modelo Padrão</div><div class="card-term">Modelo ΛCDM</div><div class="card-desc">Cosmologia padrão: Λ (energia escura) + CDM (matéria escura fria). Descreve a estrutura em larga escala do universo com notável precisão, mas ~95% do cosmos permanece por explicar.</div></div>
+    <div class="card"><div class="card-bar b4"></div><span class="card-icon">💀</span><div class="card-cat c4t">Cenário Futuro</div><div class="card-term">Big Rip</div><div class="card-desc">Se a energia escura se intensificar, a aceleração rasga progressivamente galáxias, estrelas, planetas e por fim os próprios átomos. Depende da equação de estado w &lt; −1.</div></div>
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🪐</span><div class="card-cat c1t">Geometria</div><div class="card-term">Espaço de de Sitter</div><div class="card-desc">Solução das equações de Einstein com Λ positiva. Universo em expansão exponencial com horizonte cósmico: regiões suficientemente distantes tornam-se inacessíveis para sempre.</div></div>
+  </div>
+
+  <p class="sec-label">▸ Linha do Tempo Cósmica</p>
+  <div class="timeline-wrap">
+    <div class="tl-track">
+      <div class="tl-node"><div class="tl-dot d1"></div><div class="tl-epoch">t = 0</div><div class="tl-name">Big Bang</div></div>
+      <div class="tl-node"><div class="tl-dot d2"></div><div class="tl-epoch">380 000 anos</div><div class="tl-name">CMB — Fundo Cósmico</div></div>
+      <div class="tl-node"><div class="tl-dot d3"></div><div class="tl-epoch">~5 mil milhões anos</div><div class="tl-name">Início da Aceleração</div></div>
+      <div class="tl-node"><div class="tl-dot d4"></div><div class="tl-epoch">13,8 mil milhões anos</div><div class="tl-name">Hoje ◀</div></div>
+      <div class="tl-node"><div class="tl-dot d5"></div><div class="tl-epoch">∞ ?</div><div class="tl-name">Big Rip / Big Freeze</div></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n">13,8 Ba</div><div class="stat-l">Idade do universo</div></div>
+    <div class="stat"><div class="stat-n">~68%</div><div class="stat-l">Energia escura</div></div>
+    <div class="stat"><div class="stat-n">70 km/s</div><div class="stat-l">H₀ por Megaparsec</div></div>
+    <div class="stat"><div class="stat-n">Nobel 2011</div><div class="stat-l">Prémio pela descoberta</div></div>
+  </div>
+
+  <footer>Cosmologia · Aceleração da Expansão do Universo · Energia Escura · ΛCDM · Física Teórica</footer>
+</div>
+
+<script>
+/* ── COSMOS BACKGROUND (realistic) ── */
+(function(){
+  const c=document.getElementById('cosmos'), ctx=c.getContext('2d');
+  let W,H,STARS=[],BH_X,BH_Y,BH_R;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const PI2=Math.PI*2;
+
+  /* ---- stars ---- */
+  function buildStars(){
+    STARS=[];
+    const n=Math.floor(W*H/520); // very dense
+    for(let i=0;i<n;i++){
+      const m=Math.random();
+      // realistic magnitude distribution: most are tiny
+      const r = m<0.006 ? rnd(1.6,2.8)   // giant bright stars
+               : m<0.04  ? rnd(1.0,1.6)
+               : m<0.18  ? rnd(0.55,1.0)
+               :            rnd(0.08,0.55);
+      // spectral colour
+      const h=Math.random();
+      STARS.push({x:rnd(0,W),y:rnd(0,H),r,a:rnd(0.28,1),h,
+                  tw:rnd(0.3,2.8),ph:rnd(0,PI2),
+                  // avoid black-hole centre
+                  placed:false});
+    }
+  }
+
+  /* ---- background ---- */
+  function drawBg(){
+    // deep cosmic void - not perfectly uniform, slight vignette
+    const g=ctx.createRadialGradient(W*.45,H*.38,0,W*.45,H*.38,Math.max(W,H)*.95);
+    g.addColorStop(0,'#08102a');
+    g.addColorStop(0.35,'#040b1a');
+    g.addColorStop(0.7,'#020710');
+    g.addColorStop(1,'#010208');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+
+  /* ---- milky way band ---- */
+  function drawMilkyWay(){
+    // multiple overlapping passes for depth
+    const cx=W*.48, cy=H*.46;
+    const passes=[
+      {rx:W*.68,ry:H*.055,a:-.08,op:0.028,col:'160,168,255'},
+      {rx:W*.60,ry:H*.038,a:-.08,op:0.022,col:'180,185,255'},
+      {rx:W*.50,ry:H*.028,a:-.09,op:0.032,col:'200,205,255'},
+      {rx:W*.72,ry:H*.07, a:-.07,op:0.018,col:'120,130,220'},
+      {rx:W*.80,ry:H*.09, a:-.06,op:0.012,col:'90,100,200'},
+    ];
+    passes.forEach(p=>{
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,p.rx);
+      g.addColorStop(0,`rgba(${p.col},${p.op})`);
+      g.addColorStop(0.5,`rgba(${p.col},${p.op*0.5})`);
+      g.addColorStop(1,'transparent');
+      ctx.save();
+      ctx.translate(cx,cy); ctx.rotate(p.a);
+      ctx.scale(1, p.ry/p.rx);
+      ctx.beginPath(); ctx.arc(0,0,p.rx,0,PI2);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.restore();
+    });
+    // dust lanes (slightly darker streaks)
+    for(let d=0;d<3;d++){
+      const dy=cy+(d-1)*H*.03;
+      const lg=ctx.createLinearGradient(W*.05,dy,W*.95,dy);
+      lg.addColorStop(0,'transparent');
+      lg.addColorStop(0.3,`rgba(2,4,14,0.06)`);
+      lg.addColorStop(0.5,`rgba(2,4,14,0.10)`);
+      lg.addColorStop(0.7,`rgba(2,4,14,0.06)`);
+      lg.addColorStop(1,'transparent');
+      ctx.save(); ctx.translate(0,dy); ctx.rotate(-.08);
+      ctx.fillStyle=lg; ctx.fillRect(-W*.1,-H*.015,W*1.2,H*.03);
+      ctx.restore();
+    }
+  }
+
+  /* ---- nebulae ---- */
+  function drawNebulae(){
+    // layered emission + reflection nebulae
+    const nebulae=[
+      // {cx,cy,rx,ry,rot, layers:[{col,stop,op}]}
+      {cx:.12,cy:.20,rx:.32,ry:.45,rot:.15,layers:[
+        {col:'20,15,100',op:.18},{col:'40,10,80',op:.10},{col:'10,30,120',op:.08}
+      ]},
+      {cx:.82,cy:.62,rx:.36,ry:.44,rot:-.2,layers:[
+        {col:'70,15,85',op:.16},{col:'90,20,60',op:.09},{col:'50,10,100',op:.07}
+      ]},
+      {cx:.50,cy:.82,rx:.40,ry:.28,rot:.05,layers:[
+        {col:'15,50,115',op:.14},{col:'10,70,100',op:.08}
+      ]},
+      {cx:.92,cy:.10,rx:.22,ry:.26,rot:-.1,layers:[
+        {col:'60,15,80',op:.13},{col:'80,30,50',op:.07}
+      ]},
+      {cx:.28,cy:.92,rx:.28,ry:.20,rot:.2,layers:[
+        {col:'8,35,95',op:.12},{col:'15,55,80',op:.06}
+      ]},
+      // extra faint wide nebula for depth
+      {cx:.55,cy:.35,rx:.55,ry:.50,rot:-.05,layers:[
+        {col:'25,18,90',op:.07},{col:'35,12,70',op:.04}
+      ]},
+    ];
+    nebulae.forEach(n=>{
+      n.layers.forEach((l,li)=>{
+        const scale=1-li*.15;
+        const rx=n.rx*W*scale, ry=n.ry*H*scale;
+        const bx=n.cx*W, by=n.cy*H;
+        const g=ctx.createRadialGradient(bx,by,0,bx,by,Math.max(rx,ry));
+        g.addColorStop(0,`rgba(${l.col},${l.op})`);
+        g.addColorStop(0.55,`rgba(${l.col},${l.op*.4})`);
+        g.addColorStop(1,'transparent');
+        ctx.save();
+        ctx.translate(bx,by); ctx.rotate(n.rot);
+        ctx.scale(1,ry/rx);
+        ctx.beginPath(); ctx.arc(0,0,rx,0,PI2);
+        ctx.fillStyle=g; ctx.fill();
+        ctx.restore();
+      });
+    });
+  }
+
+  /* ---- distant galaxies ---- */
+  function drawGalaxies(){
+    const gs=[
+      {x:.06,y:.12,r:22,a:.5, type:'s',c:'rgba(175,205,255,'},
+      {x:.94,y:.25,r:16,a:-.7,type:'e',c:'rgba(255,215,165,'},
+      {x:.15,y:.80,r:14,a:.95,type:'s',c:'rgba(155,188,255,'},
+      {x:.88,y:.84,r:18,a:-.4,type:'e',c:'rgba(200,178,255,'},
+      {x:.48,y:.05,r:12,a:.2, type:'s',c:'rgba(170,220,255,'},
+      {x:.68,y:.96,r:13,a:-1.2,type:'e',c:'rgba(255,220,172,'},
+      {x:.02,y:.55,r: 9,a:.7, type:'e',c:'rgba(200,190,255,'},
+      {x:.97,y:.68,r:10,a:-.5,type:'s',c:'rgba(165,210,255,'},
+    ];
+    gs.forEach(g=>{
+      // skip if too close to black hole
+      const dx=(g.x*W-BH_X)/W, dy=(g.y*H-BH_Y)/H;
+      if(Math.sqrt(dx*dx+dy*dy)<0.14) return;
+      ctx.save(); ctx.translate(g.x*W,g.y*H); ctx.rotate(g.a);
+      if(g.type==='e'){
+        const eg=ctx.createRadialGradient(0,0,0,0,0,g.r);
+        eg.addColorStop(0,g.c+'0.92)'); eg.addColorStop(.45,g.c+'0.32)'); eg.addColorStop(1,'transparent');
+        ctx.scale(1,.42); ctx.beginPath(); ctx.arc(0,0,g.r,0,PI2);
+        ctx.fillStyle=eg; ctx.fill();
+      } else {
+        for(let arm=0;arm<2;arm++){
+          ctx.save(); ctx.rotate(arm*Math.PI);
+          for(let i=0;i<65;i++){
+            const t=i/65, ang=t*Math.PI*2.8, dist=t*g.r;
+            const px=Math.cos(ang)*dist, py=Math.sin(ang)*dist*.42;
+            ctx.beginPath(); ctx.arc(px,py,g.r*.07*(1-t*.35),0,PI2);
+            ctx.fillStyle=g.c+(0.85*(1-t))+')'; ctx.fill();
+          }
+          ctx.restore();
+        }
+        const cg=ctx.createRadialGradient(0,0,0,0,0,g.r*.42);
+        cg.addColorStop(0,g.c+'0.98)'); cg.addColorStop(1,'transparent');
+        ctx.beginPath(); ctx.arc(0,0,g.r*.42,0,PI2);
+        ctx.fillStyle=cg; ctx.fill();
+      }
+      ctx.restore();
+    });
+  }
+
+  /* ---- BLACK HOLE ---- */
+  function drawBlackHole(t){
+    const bx=BH_X, by=BH_Y, R=BH_R;
+
+    // === 1. Gravitational lensing — warped starlight ring ===
+    for(let ring=8;ring>0;ring--){
+      const rr=R*(1.5+ring*.55);
+      const op=0.06-ring*0.005;
+      const g=ctx.createRadialGradient(bx,by,rr*.7,bx,by,rr*1.2);
+      g.addColorStop(0,'transparent');
+      g.addColorStop(0.5,`rgba(200,220,255,${op})`);
+      g.addColorStop(1,'transparent');
+      ctx.beginPath(); ctx.arc(bx,by,rr,0,PI2);
+      ctx.strokeStyle=`rgba(200,220,255,${op*1.5})`; ctx.lineWidth=ring*.4;
+      ctx.stroke();
+    }
+
+    // === 2. Photon sphere glow (very tight bright ring) ===
+    const photonR=R*1.52;
+    const pg=ctx.createRadialGradient(bx,by,photonR*.88,bx,by,photonR*1.18);
+    pg.addColorStop(0,'transparent');
+    pg.addColorStop(0.4,'rgba(255,240,200,0.28)');
+    pg.addColorStop(0.7,'rgba(255,200,120,0.18)');
+    pg.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(bx,by,photonR*1.18,0,PI2);
+    ctx.fillStyle=pg; ctx.fill();
+
+    // === 3. Accretion disk — rotating, hot, multi-layer ===
+    const diskAngle=t*0.18; // slow rotation
+    ctx.save();
+    ctx.translate(bx,by);
+    ctx.rotate(diskAngle);
+
+    // outer cool disk
+    for(let layer=0;layer<4;layer++){
+      const diskRx=R*(3.8+layer*0.9);
+      const diskRy=diskRx*0.22;
+      const bright=0.18-layer*0.03;
+      const dg=ctx.createRadialGradient(0,0,R*1.4,0,0,diskRx);
+      if(layer===0){
+        dg.addColorStop(0,'rgba(255,160,60,0.0)');
+        dg.addColorStop(0.3,`rgba(255,130,40,${bright})`);
+        dg.addColorStop(0.65,`rgba(255,80,20,${bright*.7})`);
+        dg.addColorStop(1,'transparent');
+      } else {
+        dg.addColorStop(0,'transparent');
+        dg.addColorStop(0.4,`rgba(255,${100-layer*20},${20+layer*5},${bright*.6})`);
+        dg.addColorStop(1,'transparent');
+      }
+      ctx.save();
+      ctx.scale(1, diskRy/diskRx);
+      ctx.beginPath(); ctx.ellipse(0,0,diskRx,diskRx,0,0,PI2);
+      ctx.fillStyle=dg; ctx.fill();
+      ctx.restore();
+    }
+
+    // inner hot disk (blueish-white, very bright, close to horizon)
+    const hdg=ctx.createRadialGradient(0,0,R*1.0,0,0,R*2.2);
+    hdg.addColorStop(0,'rgba(255,255,240,0.0)');
+    hdg.addColorStop(0.3,'rgba(255,255,200,0.35)');
+    hdg.addColorStop(0.6,'rgba(255,220,120,0.22)');
+    hdg.addColorStop(1,'transparent');
+    ctx.save();
+    ctx.scale(1,0.18);
+    ctx.beginPath(); ctx.ellipse(0,0,R*2.2,R*2.2,0,0,PI2);
+    ctx.fillStyle=hdg; ctx.fill();
+    ctx.restore();
+
+    // disk edge highlight lines (simulate structured disk bands)
+    for(let b=0;b<3;b++){
+      const br=R*(2.0+b*.6);
+      ctx.save();
+      ctx.scale(1,0.22);
+      ctx.beginPath(); ctx.ellipse(0,0,br,br,0,0,PI2);
+      ctx.strokeStyle=`rgba(255,${180-b*40},${80-b*20},${0.12-b*0.02})`;
+      ctx.lineWidth=1.2-b*.3; ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.restore(); // end disk rotation
+
+    // === 4. Relativistic jets (perpendicular to disk) ===
+    const jetH=R*9;
+    for(const sign of [1,-1]){
+      // jet cone
+      const jg=ctx.createLinearGradient(bx,by,bx,by+sign*jetH);
+      jg.addColorStop(0,'rgba(140,190,255,0.55)');
+      jg.addColorStop(0.3,'rgba(100,160,255,0.20)');
+      jg.addColorStop(0.7,'rgba(80,130,255,0.08)');
+      jg.addColorStop(1,'transparent');
+      ctx.save();
+      ctx.translate(bx,by);
+      ctx.beginPath();
+      ctx.moveTo(-R*.18,0);
+      ctx.quadraticCurveTo(-R*.35,sign*jetH*.5, -R*.5,sign*jetH);
+      ctx.lineTo(R*.5,sign*jetH);
+      ctx.quadraticCurveTo(R*.35,sign*jetH*.5, R*.18,0);
+      ctx.closePath();
+      ctx.fillStyle=jg; ctx.fill();
+      // jet core streak
+      const jc=ctx.createLinearGradient(0,0,0,sign*jetH);
+      jc.addColorStop(0,'rgba(200,225,255,0.7)');
+      jc.addColorStop(0.4,'rgba(160,200,255,0.35)');
+      jc.addColorStop(1,'transparent');
+      ctx.beginPath();
+      ctx.moveTo(-R*.06,0); ctx.lineTo(R*.06,0);
+      ctx.lineTo(R*.12,sign*jetH); ctx.lineTo(-R*.12,sign*jetH);
+      ctx.closePath();
+      ctx.fillStyle=jc; ctx.fill();
+      ctx.restore();
+    }
+
+    // === 5. Outer diffuse glow (corona) ===
+    const corona=ctx.createRadialGradient(bx,by,R,bx,by,R*6);
+    corona.addColorStop(0,'rgba(255,160,40,0.10)');
+    corona.addColorStop(0.4,'rgba(200,100,20,0.06)');
+    corona.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(bx,by,R*6,0,PI2);
+    ctx.fillStyle=corona; ctx.fill();
+
+    // === 6. Event horizon — pure black circle ===
+    ctx.beginPath(); ctx.arc(bx,by,R,0,PI2);
+    ctx.fillStyle='#000000'; ctx.fill();
+
+    // === 7. Shadow edge (Schwarzschild silhouette brightening) ===
+    const shadow=ctx.createRadialGradient(bx,by,R*.85,bx,by,R*1.1);
+    shadow.addColorStop(0,'rgba(0,0,0,1)');
+    shadow.addColorStop(0.7,'rgba(0,0,0,0.9)');
+    shadow.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(bx,by,R*1.1,0,PI2);
+    ctx.fillStyle=shadow; ctx.fill();
+
+    // === 8. Label ===
+    ctx.save();
+    ctx.font=`500 ${Math.max(9,R*.5)}px Share Tech Mono, monospace`;
+    ctx.fillStyle='rgba(126,207,255,0.45)';
+    ctx.textAlign='center';
+    ctx.fillText('BURACO NEGRO', bx, by+R*8.5);
+    ctx.restore();
+  }
+
+  /* ---- stars ---- */
+  function drawStars(t){
+    STARS.forEach(s=>{
+      // avoid drawing stars inside BH
+      const dx=s.x-BH_X, dy=s.y-BH_Y;
+      if(dx*dx+dy*dy < BH_R*BH_R*4) return;
+
+      const fl=0.80+0.20*Math.sin(t*s.tw+s.ph);
+      let col;
+      if(s.h<.10)      col=`rgba(255,248,230,${s.a*fl})`;   // warm white
+      else if(s.h<.32) col=`rgba(170,215,255,${s.a*fl})`;   // O/B blue-white
+      else if(s.h<.58) col=`rgba(255,255,255,${s.a*fl})`;   // white
+      else if(s.h<.76) col=`rgba(255,235,170,${s.a*fl})`;   // F/G yellow
+      else if(s.h<.90) col=`rgba(255,190,110,${s.a*fl})`;   // K orange
+      else             col=`rgba(215,175,255,${s.a*fl})`;   // variable/purple
+
+      if(s.r>1.5){
+        // glow halo
+        const gw=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);
+        gw.addColorStop(0,col); gw.addColorStop(1,'transparent');
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r*8,0,PI2);
+        ctx.fillStyle=gw; ctx.fill();
+        // diffraction spikes (4-point)
+        ctx.save();
+        ctx.globalAlpha=s.a*fl*0.28;
+        ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=0.4;
+        const sl=s.r*18;
+        [[s.x-sl,s.y,s.x+sl,s.y],[s.x,s.y-sl,s.x,s.y+sl]].forEach(([x1,y1,x2,y2])=>{
+          ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+        });
+        // diagonal spikes (45°)
+        ctx.globalAlpha=s.a*fl*0.12;
+        const sd=sl*.65;
+        [[s.x-sd,s.y-sd,s.x+sd,s.y+sd],[s.x+sd,s.y-sd,s.x-sd,s.y+sd]].forEach(([x1,y1,x2,y2])=>{
+          ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+        });
+        ctx.restore();
+      }
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,PI2);
+      ctx.fillStyle=col; ctx.fill();
+    });
+  }
+
+  /* ---- resize ---- */
+  function resize(){
+    W=c.width=window.innerWidth;
+    H=c.height=window.innerHeight;
+    // place black hole in lower-right quadrant, away from poster centre
+    BH_X=W*.82; BH_Y=H*.72; BH_R=Math.min(W,H)*.042;
+    buildStars();
+  }
+
+  let lastT=0;
+  function animate(ts){
+    requestAnimationFrame(animate);
+    const t=ts/1000;
+    if(t-lastT<.04)return; lastT=t;
+    drawBg();
+    drawMilkyWay();
+    drawNebulae();
+    drawGalaxies();
+    drawBlackHole(t);
+    drawStars(t);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  requestAnimationFrame(animate);
+})();
+
+/* ── DIAGRAM ── */
+(function(){
+  const c=document.getElementById('diagram'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+  const eo=t=>1-Math.pow(1-t,3);
+
+  const bg=ctx.createLinearGradient(0,0,W,0);
+  bg.addColorStop(0,'#060918');bg.addColorStop(.5,'#07091c');bg.addColorStop(1,'#050815');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  const ytop=x=>H*.5-H*.43*eo(x/W)*Math.pow(x/W,.28);
+  const ybot=x=>H*.5+H*.43*eo(x/W)*Math.pow(x/W,.28);
+
+  // cone fill
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(0,H*.5);
+  for(let x=0;x<=W;x+=4)ctx.lineTo(x,ytop(x));
+  for(let x=W;x>=0;x-=4)ctx.lineTo(x,ybot(x));
+  ctx.closePath();
+  const cf=ctx.createLinearGradient(0,0,W,0);
+  cf.addColorStop(0,'rgba(255,140,80,.22)');
+  cf.addColorStop(.28,'rgba(80,55,175,.13)');
+  cf.addColorStop(.65,'rgba(28,58,158,.10)');
+  cf.addColorStop(1,'rgba(8,28,98,.07)');
+  ctx.fillStyle=cf;ctx.fill();ctx.restore();
+
+  // cone edges
+  [ytop,ybot].forEach(fn=>{
+    ctx.beginPath();ctx.moveTo(0,H*.5);
+    for(let x=0;x<=W;x+=3)ctx.lineTo(x,fn(x));
+    ctx.strokeStyle='rgba(126,207,255,.22)';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // subtle internal gradient bands (expansion indicator)
+  for(let band=0;band<5;band++){
+    const bx=W*(0.18+band*0.16);
+    const ty=ytop(bx),by2=ybot(bx);
+    const bg2=ctx.createLinearGradient(bx,ty,bx,by2);
+    bg2.addColorStop(0,'transparent');
+    bg2.addColorStop(.5,`rgba(126,207,255,${0.04-band*0.005})`);
+    bg2.addColorStop(1,'transparent');
+    ctx.fillStyle=bg2;
+    ctx.fillRect(bx-1,ty,2,by2-ty);
+  }
+
+  // big bang glow
+  const bbg=ctx.createRadialGradient(3,H*.5,0,3,H*.5,36);
+  bbg.addColorStop(0,'rgba(255,210,100,.95)');
+  bbg.addColorStop(.3,'rgba(255,130,55,.5)');
+  bbg.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(3,H*.5,36,0,Math.PI*2);ctx.fillStyle=bbg;ctx.fill();
+  ctx.beginPath();ctx.arc(3,H*.5,5,0,Math.PI*2);ctx.fillStyle='#ffe066';ctx.fill();
+
+  // galaxies
+  const gdata=[
+    {tx:.18,dy:-.10},{tx:.18,dy:.08},
+    {tx:.36,dy:-.18},{tx:.36,dy:.16},
+    {tx:.54,dy:-.26},{tx:.54,dy:.24},{tx:.54,dy:.01},
+    {tx:.72,dy:-.30},{tx:.72,dy:.28},{tx:.72,dy:-.09},{tx:.72,dy:.10},
+    {tx:.88,dy:-.34},{tx:.88,dy:.32},{tx:.88,dy:-.14},{tx:.88,dy:.14},
+  ];
+  const gcols=['rgba(200,220,255,','rgba(255,222,180,','rgba(200,180,255,','rgba(175,232,200,'];
+  gdata.forEach((gd,i)=>{
+    const x=gd.tx*W,ty2=ytop(x),by2=ybot(x);
+    const mid=(ty2+by2)/2,span=(by2-ty2)/2;
+    const y=mid+gd.dy*span*2.3;
+    if(y<ty2||y>by2)return;
+    const col=gcols[i%gcols.length];
+    const sz=2.4+gd.tx*3.2;
+    ctx.save();ctx.translate(x,y);ctx.rotate(i*.75);
+    const eg=ctx.createRadialGradient(0,0,0,0,0,sz*2.2);
+    eg.addColorStop(0,col+'0.88)');eg.addColorStop(1,'transparent');
+    ctx.scale(1,.44);ctx.beginPath();ctx.arc(0,0,sz*2.2,0,Math.PI*2);
+    ctx.fillStyle=eg;ctx.fill();ctx.restore();
+  });
+
+  // midline dashed arrow
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.52,H*.5);
+  ctx.bezierCurveTo(W*.64,H*.5,W*.74,H*.5,W*.95,H*.5);
+  ctx.strokeStyle='rgba(126,207,255,.5)';ctx.lineWidth=1.4;
+  ctx.setLineDash([5,3]);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(W*.95,H*.5);ctx.lineTo(W*.915,H*.5-5);ctx.lineTo(W*.915,H*.5+5);
+  ctx.closePath();ctx.fillStyle='rgba(126,207,255,.7)';ctx.fill();
+  ctx.restore();
+
+  // today marker
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.82,ytop(W*.82)+3);ctx.lineTo(W*.82,ybot(W*.82)-3);
+  ctx.strokeStyle='rgba(200,170,255,.32)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();
+  ctx.setLineDash([]);ctx.font='500 9px Share Tech Mono,monospace';
+  ctx.fillStyle='rgba(200,170,255,.6)';ctx.fillText('HOJE',W*.834,15);ctx.restore();
+
+  // labels
+  ctx.font='bold 11px Orbitron,monospace';ctx.fillStyle='rgba(255,220,100,.9)';
+  ctx.fillText('Big Bang',7,H*.5-14);
+  ctx.font='10px Share Tech Mono,monospace';ctx.fillStyle='rgba(126,207,255,.62)';
+  ctx.fillText('← Desaceleração   →       ← Aceleração acelerada →',W*.22,H-10);
+})();
+</script>
+</body>
+</html>
