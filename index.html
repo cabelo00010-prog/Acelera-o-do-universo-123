@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aceleração da Expansão do Universo</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #020409;
+  --glass: rgba(4,6,18,0.72);
+  --glass2: rgba(2,4,12,0.85);
+  --c1: #7ecfff;
+  --c2: #c8aaff;
+  --c3: #ff8c72;
+  --c4: #ffe066;
+  --muted: #8899aa;
+  --text: #dce8f5;
+}
+
+html, body { width: 100%; min-height: 100vh; background: var(--ink); }
+
+#cosmos { position: fixed; inset: 0; z-index: 0; }
+
+#grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* ── prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  #cosmos { display: none; }
+  .card { transition: none !important; animation: none !important; }
+  .poster > *, .reveal { opacity: 1 !important; transform: none !important; animation: none !important; }
+  @keyframes fadein { from{opacity:1} to{opacity:1} }
+  @keyframes slideup { from{opacity:1;transform:none} to{opacity:1;transform:none} }
+}
+
+.poster {
+  position: relative; z-index: 2;
+  max-width: 960px; margin: 0 auto;
+  padding: 60px 36px 72px;
+  color: var(--text); font-family: 'Libre Baskerville', serif;
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* staggered children inside .reveal-group */
+.reveal-group .card { opacity: 0; transform: translateY(22px); transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.35s, box-shadow 0.35s; }
+.reveal-group.visible .card:nth-child(1){ opacity:1; transform:none; transition-delay:0.04s; }
+.reveal-group.visible .card:nth-child(2){ opacity:1; transform:none; transition-delay:0.10s; }
+.reveal-group.visible .card:nth-child(3){ opacity:1; transform:none; transition-delay:0.16s; }
+.reveal-group.visible .card:nth-child(4){ opacity:1; transform:none; transition-delay:0.22s; }
+.reveal-group.visible .card:nth-child(5){ opacity:1; transform:none; transition-delay:0.28s; }
+.reveal-group.visible .card:nth-child(6){ opacity:1; transform:none; transition-delay:0.34s; }
+.reveal-group.visible .card:nth-child(7){ opacity:1; transform:none; transition-delay:0.40s; }
+.reveal-group.visible .card:nth-child(8){ opacity:1; transform:none; transition-delay:0.46s; }
+.reveal-group.visible .card:nth-child(9){ opacity:1; transform:none; transition-delay:0.52s; }
+
+.eyebrow {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.42em; color: var(--c1); text-align: center;
+  text-transform: uppercase; opacity: 0.75; margin-bottom: 18px;
+  animation: fadein 1.2s ease both;
+}
+
+h1 {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(2rem, 5.5vw, 3.6rem); text-align: center;
+  line-height: 1.08; letter-spacing: -0.01em;
+  background: linear-gradient(160deg, #ffffff 0%, var(--c1) 38%, var(--c2) 72%, var(--c3) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 16px; animation: fadein 1.2s ease both 0.1s;
+}
+
+.subtitle {
+  font-style: italic; font-size: 0.96rem; color: var(--muted);
+  text-align: center; max-width: 560px; margin: 0 auto 10px;
+  line-height: 1.8; animation: fadein 1.2s ease both 0.2s;
+}
+
+.rule {
+  width: 200px; height: 1px; margin: 24px auto 52px;
+  background: linear-gradient(to right, transparent, var(--c1), var(--c2), var(--c3), transparent);
+  animation: fadein 1.2s ease both 0.3s;
+}
+
+.diagram-wrap {
+  display: flex; justify-content: center; margin-bottom: 56px;
+}
+#diagram {
+  border-radius: 16px; border: 1px solid rgba(126,207,255,0.12);
+  box-shadow: 0 0 80px rgba(79,130,200,0.18), 0 0 160px rgba(100,60,200,0.1);
+  max-width: 100%; height: auto;
+}
+
+.sec-label {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.38em; color: var(--c2); text-align: center;
+  text-transform: uppercase; margin-bottom: 24px; opacity: 0.7;
+}
+
+/* ── GRID — responsive ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-bottom: 48px;
+}
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 420px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--glass); border: 1px solid rgba(126,207,255,0.1);
+  border-radius: 14px; padding: 22px 18px 20px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 14px;
+  background: radial-gradient(ellipse at top left, rgba(126,207,255,0.04), transparent 60%);
+  pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(126,207,255,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(126,207,255,0.1);
+}
+.card-bar { position: absolute; top:0;left:0;right:0; height:2px; border-radius:14px 14px 0 0; }
+.b1{background:linear-gradient(to right,transparent,#7ecfff,transparent)}
+.b2{background:linear-gradient(to right,transparent,#c8aaff,transparent)}
+.b3{background:linear-gradient(to right,transparent,#ff8c72,transparent)}
+.b4{background:linear-gradient(to right,transparent,#ffe066,transparent)}
+
+.card-icon { font-size: 1.4rem; display: block; margin-bottom: 10px; }
+.card-cat {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;
+}
+.c1t{color:var(--c1)}.c2t{color:var(--c2)}.c3t{color:var(--c3)}.c4t{color:var(--c4)}
+
+.card-term {
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  font-size: clamp(0.78rem, 1.8vw, 0.95rem); color: #fff;
+  margin-bottom: 10px; line-height: 1.3;
+}
+.card-desc { font-size: clamp(0.72rem, 1.5vw, 0.78rem); color: var(--muted); line-height: 1.7; }
+.formula {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.74rem;
+  color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.04);
+  border-radius: 6px; padding: 5px 10px; display: inline-block; margin-top: 10px;
+}
+
+/* ── TIMELINE ── */
+.timeline-wrap { margin-bottom: 48px; }
+.tl-track {
+  position: relative; display: flex; align-items: flex-start;
+  justify-content: space-between; padding: 0 4px;
+}
+.tl-track::before {
+  content:''; position: absolute; top:13px; left:4px; right:4px; height:1px;
+  background: linear-gradient(to right, var(--c3), var(--c2) 50%, var(--c1)); opacity:0.5;
+}
+.tl-node { flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; }
+.tl-dot {
+  width:13px; height:13px; border-radius:50%;
+  background:var(--ink); border:2px solid; position:relative; z-index:1; flex-shrink:0;
+}
+.d1{border-color:var(--c3);box-shadow:0 0 10px var(--c3)}
+.d2{border-color:var(--c3);box-shadow:0 0 10px var(--c3)}
+.d3{border-color:var(--c2);box-shadow:0 0 10px var(--c2)}
+.d4{border-color:var(--c1);box-shadow:0 0 8px var(--c1)}
+.d5{border-color:var(--c1);box-shadow:0 0 8px var(--c1)}
+.tl-epoch { font-family:'Share Tech Mono',monospace; font-size:clamp(0.5rem,1.3vw,0.58rem); color:var(--muted); line-height:1.5; }
+.tl-name { font-size:clamp(0.62rem,1.5vw,0.72rem); font-weight:700; color:var(--text); line-height:1.4; }
+
+/* ── STATS — responsive ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  overflow: hidden; border-radius: 14px;
+  border: 1px solid rgba(126,207,255,0.12); margin-bottom: 48px;
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .stat { border-right: none !important; border-bottom: 1px solid rgba(126,207,255,0.08); }
+  .stat:nth-child(odd) { border-right: 1px solid rgba(126,207,255,0.08) !important; }
+  .stat:nth-last-child(-n+2) { border-bottom: none; }
+}
+.stat {
+  padding: 20px 12px; text-align: center; background: var(--glass2);
+  border-right: 1px solid rgba(126,207,255,0.08);
+}
+.stat:last-child{border-right:none}
+.stat-n {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:clamp(0.9rem,2.4vw,1.45rem); color:var(--c1); margin-bottom:6px; line-height:1;
+}
+.stat-l { font-size:clamp(0.6rem,1.2vw,0.66rem); color:var(--muted); font-style:italic; line-height:1.5; }
+
+/* ── BLACK HOLE SECTION ── */
+.bh-section {
+  margin-bottom: 56px;
+  border-radius: 20px;
+  border: 1px solid rgba(126,207,255,0.12);
+  overflow: hidden;
+  position: relative;
+  background: #010208;
+}
+.bh-section-label {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.38em; color: var(--c2); text-align: center;
+  text-transform: uppercase; opacity: 0.7; z-index: 10; white-space: nowrap;
+  pointer-events: none;
+}
+#bh-canvas {
+  display: block; width: 100%;
+  height: clamp(260px, 40vw, 460px);
+  cursor: crosshair;
+}
+.bh-hint {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.55rem;
+  letter-spacing: 0.22em; color: rgba(126,207,255,0.4);
+  text-transform: uppercase; white-space: nowrap; pointer-events: none;
+  animation: pulse-hint 3s ease-in-out infinite;
+}
+@keyframes pulse-hint { 0%,100%{opacity:0.4} 50%{opacity:0.85} }
+
+footer {
+  text-align:center; font-family:'Share Tech Mono',monospace; font-size:0.58rem;
+  letter-spacing:0.28em; color:rgba(136,153,170,0.35); text-transform:uppercase;
+}
+
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slideup{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── COMMENTS ── */
+.comments-section { margin-bottom: 56px; }
+.comments-form {
+  background: var(--glass); border: 1px solid rgba(126,207,255,0.12);
+  border-radius: 16px; padding: 28px 24px 22px; margin-bottom: 28px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.comments-form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 500px) { .comments-form-row { flex-direction: column; } }
+.comments-input {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(126,207,255,0.15);
+  border-radius: 8px; padding: 10px 14px; color: var(--text);
+  font-family: 'Libre Baskerville', serif; font-size: 0.85rem;
+  outline: none; transition: border-color 0.2s;
+}
+.comments-input:focus { border-color: rgba(126,207,255,0.45); }
+.comments-input::placeholder { color: var(--muted); opacity: 0.6; }
+textarea.comments-input { resize: vertical; min-height: 88px; width: 100%; }
+.comments-btn {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(126,207,255,0.12), rgba(200,170,255,0.12));
+  border: 1px solid rgba(126,207,255,0.28); border-radius: 8px;
+  color: var(--c1); padding: 10px 22px; cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, transform 0.15s; white-space: nowrap;
+}
+.comments-btn:hover:not(:disabled) { background: linear-gradient(135deg, rgba(126,207,255,0.24), rgba(200,170,255,0.20)); border-color: rgba(126,207,255,0.5); transform: translateY(-1px); }
+.comments-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.comments-status { font-family: 'Share Tech Mono', monospace; font-size: 0.63rem; letter-spacing: 0.1em; min-height: 16px; margin-top: 8px; }
+.comments-status.ok { color: var(--c1); } .comments-status.err { color: var(--c3); }
+.comments-list { display: flex; flex-direction: column; gap: 12px; }
+.comment-card {
+  background: var(--glass); border: 1px solid rgba(126,207,255,0.08);
+  border-radius: 12px; padding: 18px 20px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  animation: cslide 0.4s ease both;
+}
+@keyframes cslide { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.comment-header { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.comment-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.62rem; color: #020409;
+}
+.comment-autor { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--c1); }
+.comment-data { font-family: 'Share Tech Mono', monospace; font-size: 0.56rem; color: var(--muted); margin-left: auto; opacity: 0.7; }
+.comment-texto { font-size: 0.82rem; color: var(--text); line-height: 1.72; }
+.comments-empty { text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; color: var(--muted); opacity: 0.45; padding: 28px 0; }
+.comments-spinner { text-align: center; padding: 24px; }
+.comments-spinner::after { content:''; display:inline-block; width:16px; height:16px; border:2px solid rgba(126,207,255,0.18); border-top-color:var(--c1); border-radius:50%; animation:cspin .8s linear infinite; }
+@keyframes cspin { to{transform:rotate(360deg)} }
+.comment-del {
+  margin-left: auto; background: none; border: none; cursor: pointer;
+  font-size: 0.62rem; font-family: 'Share Tech Mono', monospace;
+  color: rgba(255,100,80,0.0); padding: 2px 6px; border-radius: 4px;
+  transition: color 0.2s, background 0.2s; letter-spacing: 0.08em;
+}
+.comment-card:hover .comment-del { color: rgba(255,100,80,0.45); }
+.comment-del:hover { color: rgba(255,100,80,0.9) !important; background: rgba(255,80,60,0.1); }
+.comment-del.confirm { color: rgba(255,200,80,0.9) !important; background: rgba(255,180,60,0.12); }
+
+</style>
+</head>
+<body>
+<canvas id="cosmos"></canvas>
+<div id="grain"></div>
+
+<div class="poster">
+  <p class="eyebrow">Cosmologia · Astrofísica · Física Teórica</p>
+  <h1>Aceleração da<br>Expansão do Universo</h1>
+  <p class="subtitle">O universo não só se expande, expande-se cada vez mais depressa. Uma força misteriosa atravessa o cosmos, empurrando as galáxias para além do alcance eterno da luz.</p>
+  <div class="rule"></div>
+
+  <div class="diagram-wrap reveal">
+    <canvas id="diagram" width="780" height="230"></canvas>
+  </div>
+
+  <p class="sec-label reveal">▸ Conceitos Fundamentais</p>
+  <div class="grid reveal-group">
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🌌</span><div class="card-cat c1t">Descoberta · 1998</div><div class="card-term">Expansão Acelerada</div><div class="card-desc">Descoberta por Perlmutter, Schmidt e Riess ao estudar supernovas Tipo Ia distantes. O ritmo de expansão do universo está a aumentar. Premiados com o Nobel em 2011.</div></div>
+    <div class="card"><div class="card-bar b2"></div><span class="card-icon">⚫</span><div class="card-cat c2t">Causa Provável</div><div class="card-term">Energia Escura</div><div class="card-desc">Componente desconhecida que constitui ~68% da energia total do universo. Age como pressão negativa que contraria a gravidade e acelera a expansão.</div></div>
+    <div class="card"><div class="card-bar b3"></div><span class="card-icon">💥</span><div class="card-cat c3t">Vela-Padrão</div><div class="card-term">Supernova Tipo Ia</div><div class="card-desc">Explosões termonucleares de luminosidade intrínseca previsível. Permitiram medir distâncias cósmicas com precisão e detetaram o afastamento anómalo das galáxias.</div></div>
+    <div class="card"><div class="card-bar b4"></div><span class="card-icon">📐</span><div class="card-cat c4t">Lei Fundamental</div><div class="card-term">Lei de Hubble-Lemaître</div><div class="card-desc">Galáxias afastam-se proporcionalmente à sua distância. A expansão não é explosão, é o próprio espaço-tempo a dilatar-se em todas as direções.</div><div class="formula">v = H₀ · d</div></div>
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🔢</span><div class="card-cat c1t">Parâmetro Central</div><div class="card-term">Constante de Hubble H₀</div><div class="card-desc">Taxa de expansão do universo: ~70 km/s/Mpc. A "Tensão de Hubble", discrepância entre medições — é um dos maiores mistérios da cosmologia moderna.</div></div>
+    <div class="card"><div class="card-bar b2"></div><span class="card-icon">λ</span><div class="card-cat c2t">Equação de Einstein</div><div class="card-term">Constante Cosmológica Λ</div><div class="card-desc">Termo nas equações de campo da relatividade geral. Einstein introduziu-o para um universo estático; hoje é a candidata mais simples à energia escura.</div><div class="formula">Gμν + Λgμν = 8πTμν</div></div>
+    <div class="card"><div class="card-bar b3"></div><span class="card-icon">🌀</span><div class="card-cat c3t">Modelo Padrão</div><div class="card-term">Modelo ΛCDM</div><div class="card-desc">Cosmologia padrão: Λ (energia escura) + CDM (matéria escura fria). Descreve a estrutura em larga escala do universo com notável precisão, mas ~95% do cosmos permanece por explicar.</div></div>
+    <div class="card"><div class="card-bar b4"></div><span class="card-icon">💀</span><div class="card-cat c4t">Cenário Futuro</div><div class="card-term">Big Rip</div><div class="card-desc">Se a energia escura se intensificar, a aceleração rasga progressivamente galáxias, estrelas, planetas e por fim os próprios átomos. Depende da equação de estado w &lt; −1.</div></div>
+    <div class="card"><div class="card-bar b1"></div><span class="card-icon">🪐</span><div class="card-cat c1t">Geometria</div><div class="card-term">Espaço de de Sitter</div><div class="card-desc">Solução das equações de Einstein com Λ positiva. Universo em expansão exponencial com horizonte cósmico: regiões suficientemente distantes tornam-se inacessíveis para sempre.</div></div>
+  </div>
+
+  <p class="sec-label reveal">▸ Linha do Tempo Cósmica</p>
+  <div class="timeline-wrap reveal">
+    <div class="tl-track">
+      <div class="tl-node"><div class="tl-dot d1"></div><div class="tl-epoch">t = 0</div><div class="tl-name">Big Bang</div></div>
+      <div class="tl-node"><div class="tl-dot d2"></div><div class="tl-epoch">380 000 anos</div><div class="tl-name">CMB, Fundo Cósmico</div></div>
+      <div class="tl-node"><div class="tl-dot d3"></div><div class="tl-epoch">~5 mil milhões anos</div><div class="tl-name">Início da Aceleração</div></div>
+      <div class="tl-node"><div class="tl-dot d4"></div><div class="tl-epoch">13,8 mil milhões anos</div><div class="tl-name">Hoje ◀</div></div>
+      <div class="tl-node"><div class="tl-dot d5"></div><div class="tl-epoch">∞ ?</div><div class="tl-name">Big Rip / Big Freeze</div></div>
+    </div>
+  </div>
+
+  <div class="stats reveal">
+    <div class="stat"><div class="stat-n">13,8 Ba</div><div class="stat-l">Idade do universo</div></div>
+    <div class="stat"><div class="stat-n">~68%</div><div class="stat-l">Energia escura</div></div>
+    <div class="stat"><div class="stat-n">70 km/s</div><div class="stat-l">H₀ por Megaparsec</div></div>
+    <div class="stat"><div class="stat-n">Nobel 2011</div><div class="stat-l">Prémio pela descoberta</div></div>
+  </div>
+
+  <!-- ── BLACK HOLE INTERACTIVE SECTION ── -->
+  <p class="sec-label reveal">▸ Buraco Negro — Simulação Interativa</p>
+  <div class="bh-section reveal">
+    <span class="bh-section-label">Lensing Gravitacional · Anéis de Einstein · Disco de Acreção</span>
+    <canvas id="bh-canvas"></canvas>
+    <div class="bh-hint">Move o rato / toca para interagir com o buraco negro</div>
+  </div>
+
+  <!-- ── COMMENTS SECTION ── -->
+  <p class="sec-label reveal">▸ Comentários</p>
+  <div class="comments-section reveal">
+    <div class="comments-form">
+      <div class="comments-form-row">
+        <input id="cm-autor" class="comments-input" type="text" placeholder="O teu nome (opcional)" maxlength="60">
+        <button id="cm-btn" class="comments-btn">Publicar ✦</button>
+      </div>
+      <textarea id="cm-texto" class="comments-input" placeholder="Deixa um comentário… (Ctrl+Enter para publicar)" maxlength="1000"></textarea>
+      <div id="cm-status" class="comments-status"></div>
+    </div>
+    <div id="cm-list" class="comments-list"></div>
+  </div>
+
+  <footer class="reveal">Cosmologia · Aceleração da Expansão do Universo · Energia Escura · ΛCDM · Física Teórica</footer>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   REDUCED MOTION CHECK
+══════════════════════════════════════ */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══════════════════════════════════════
+   SCROLL REVEAL — Intersection Observer
+══════════════════════════════════════ */
+if (!prefersReducedMotion) {
+  const revealEls = document.querySelectorAll('.reveal, .reveal-group');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+} else {
+  // If reduced motion, just make everything visible immediately
+  document.querySelectorAll('.reveal, .reveal-group').forEach(el => el.classList.add('visible'));
+}
+
+/* ══════════════════════════════════════
+   COSMOS BACKGROUND
+══════════════════════════════════════ */
+(function(){
+  if (prefersReducedMotion) return;
+  const c=document.getElementById('cosmos'), ctx=c.getContext('2d');
+  let W,H,STARS=[],BH_X,BH_Y,BH_R;
+  let mouse={x:-9999,y:-9999}, hover=0;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const PI2=Math.PI*2;
+
+  window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('touchmove',e=>{
+    if(e.touches.length){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;}
+  },{passive:true});
+  window.addEventListener('touchstart',e=>{
+    if(e.touches.length){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;}
+  },{passive:true});
+  window.addEventListener('mouseleave',()=>{mouse.x=-9999;mouse.y=-9999;});
+
+  function buildStars(){
+    STARS=[];
+    const n=Math.floor(W*H/520);
+    for(let i=0;i<n;i++){
+      const m=Math.random();
+      const r = m<0.006 ? rnd(1.6,2.8) : m<0.04 ? rnd(1.0,1.6) : m<0.18 ? rnd(0.55,1.0) : rnd(0.08,0.55);
+      const h=Math.random();
+      STARS.push({x:rnd(0,W),y:rnd(0,H),r,a:rnd(0.28,1),h,tw:rnd(0.3,2.8),ph:rnd(0,PI2)});
+    }
+  }
+
+  function drawBg(){
+    const g=ctx.createRadialGradient(W*.45,H*.38,0,W*.45,H*.38,Math.max(W,H)*.95);
+    g.addColorStop(0,'#08102a');g.addColorStop(0.35,'#040b1a');g.addColorStop(0.7,'#020710');g.addColorStop(1,'#010208');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+
+  function drawMilkyWay(){
+    const cx=W*.48, cy=H*.46;
+    const passes=[
+      {rx:W*.68,ry:H*.055,a:-.08,op:0.028,col:'160,168,255'},
+      {rx:W*.60,ry:H*.038,a:-.08,op:0.022,col:'180,185,255'},
+      {rx:W*.50,ry:H*.028,a:-.09,op:0.032,col:'200,205,255'},
+      {rx:W*.72,ry:H*.07,a:-.07,op:0.018,col:'120,130,220'},
+      {rx:W*.80,ry:H*.09,a:-.06,op:0.012,col:'90,100,200'},
+    ];
+    passes.forEach(p=>{
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,p.rx);
+      g.addColorStop(0,`rgba(${p.col},${p.op})`);g.addColorStop(0.5,`rgba(${p.col},${p.op*0.5})`);g.addColorStop(1,'transparent');
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(p.a);ctx.scale(1,p.ry/p.rx);ctx.beginPath();ctx.arc(0,0,p.rx,0,PI2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+    });
+  }
+
+  function drawNebulae(){
+    const nebulae=[
+      {cx:.12,cy:.20,rx:.32,ry:.45,rot:.15,layers:[{col:'20,15,100',op:.18},{col:'40,10,80',op:.10},{col:'10,30,120',op:.08}]},
+      {cx:.82,cy:.62,rx:.36,ry:.44,rot:-.2,layers:[{col:'70,15,85',op:.16},{col:'90,20,60',op:.09},{col:'50,10,100',op:.07}]},
+      {cx:.50,cy:.82,rx:.40,ry:.28,rot:.05,layers:[{col:'15,50,115',op:.14},{col:'10,70,100',op:.08}]},
+      {cx:.92,cy:.10,rx:.22,ry:.26,rot:-.1,layers:[{col:'60,15,80',op:.13},{col:'80,30,50',op:.07}]},
+      {cx:.28,cy:.92,rx:.28,ry:.20,rot:.2,layers:[{col:'8,35,95',op:.12},{col:'15,55,80',op:.06}]},
+      {cx:.55,cy:.35,rx:.55,ry:.50,rot:-.05,layers:[{col:'25,18,90',op:.07},{col:'35,12,70',op:.04}]},
+    ];
+    nebulae.forEach(n=>{
+      n.layers.forEach((l,li)=>{
+        const scale=1-li*.15;
+        const rx=n.rx*W*scale, ry=n.ry*H*scale;
+        const bx=n.cx*W, by=n.cy*H;
+        const g=ctx.createRadialGradient(bx,by,0,bx,by,Math.max(rx,ry));
+        g.addColorStop(0,`rgba(${l.col},${l.op})`);g.addColorStop(0.55,`rgba(${l.col},${l.op*.4})`);g.addColorStop(1,'transparent');
+        ctx.save();ctx.translate(bx,by);ctx.rotate(n.rot);ctx.scale(1,ry/rx);ctx.beginPath();ctx.arc(0,0,rx,0,PI2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      });
+    });
+  }
+
+  function drawStars(t){
+    STARS.forEach(s=>{
+      const dx=s.x-BH_X, dy=s.y-BH_Y;
+      if(dx*dx+dy*dy < BH_R*BH_R*4) return;
+      const fl=0.80+0.20*Math.sin(t*s.tw+s.ph);
+      let col;
+      if(s.h<.10)      col=`rgba(255,248,230,${s.a*fl})`;
+      else if(s.h<.32) col=`rgba(170,215,255,${s.a*fl})`;
+      else if(s.h<.58) col=`rgba(255,255,255,${s.a*fl})`;
+      else if(s.h<.76) col=`rgba(255,235,170,${s.a*fl})`;
+      else if(s.h<.90) col=`rgba(255,190,110,${s.a*fl})`;
+      else             col=`rgba(215,175,255,${s.a*fl})`;
+      if(s.r>1.5){
+        const gw=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);
+        gw.addColorStop(0,col);gw.addColorStop(1,'transparent');
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*8,0,PI2);ctx.fillStyle=gw;ctx.fill();
+        ctx.save();ctx.globalAlpha=s.a*fl*0.28;ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=0.4;
+        const sl=s.r*18;
+        [[s.x-sl,s.y,s.x+sl,s.y],[s.x,s.y-sl,s.x,s.y+sl]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+        ctx.globalAlpha=s.a*fl*0.12;const sd=sl*.65;
+        [[s.x-sd,s.y-sd,s.x+sd,s.y+sd],[s.x+sd,s.y-sd,s.x-sd,s.y+sd]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+        ctx.restore();
+      }
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,PI2);ctx.fillStyle=col;ctx.fill();
+    });
+  }
+
+  function resize(){
+    W=c.width=window.innerWidth; H=c.height=window.innerHeight;
+    BH_X=W*.82; BH_Y=H*.72; BH_R=Math.min(W,H)*.042;
+    buildStars();
+  }
+
+  let lastT=0;
+  function animate(ts){
+    requestAnimationFrame(animate);
+    const t=ts/1000;
+    if(t-lastT<.04)return; lastT=t;
+    drawBg();drawMilkyWay();drawNebulae();drawStars(t);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  requestAnimationFrame(animate);
+})();
+
+
+/* ══════════════════════════════════════
+   DIAGRAM — improved legibility
+══════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('diagram'), ctx=c.getContext('2d');
+  const W=c.width, H=c.height;
+  const eo=t=>1-Math.pow(1-t,3);
+
+  // Background
+  const bg=ctx.createLinearGradient(0,0,W,0);
+  bg.addColorStop(0,'#060918');bg.addColorStop(.5,'#07091c');bg.addColorStop(1,'#050815');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  const CONE_TOP = H * 0.12;
+  const CONE_BOT = H * 0.88;
+  const ytop=x=>H*.5-((H*.5-CONE_TOP))*eo(x/W)*Math.pow(x/W,.28);
+  const ybot=x=>H*.5+((CONE_BOT-H*.5))*eo(x/W)*Math.pow(x/W,.28);
+
+  // Cone fill
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(0,H*.5);
+  for(let x=0;x<=W;x+=4)ctx.lineTo(x,ytop(x));
+  for(let x=W;x>=0;x-=4)ctx.lineTo(x,ybot(x));
+  ctx.closePath();
+  const cf=ctx.createLinearGradient(0,0,W,0);
+  cf.addColorStop(0,'rgba(255,140,80,.22)');cf.addColorStop(.28,'rgba(80,55,175,.13)');
+  cf.addColorStop(.65,'rgba(28,58,158,.10)');cf.addColorStop(1,'rgba(8,28,98,.07)');
+  ctx.fillStyle=cf;ctx.fill();ctx.restore();
+
+  // Cone edges
+  [ytop,ybot].forEach(fn=>{
+    ctx.beginPath();ctx.moveTo(0,H*.5);
+    for(let x=0;x<=W;x+=3)ctx.lineTo(x,fn(x));
+    ctx.strokeStyle='rgba(126,207,255,.22)';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // Bands
+  for(let band=0;band<5;band++){
+    const bx=W*(0.18+band*0.16);
+    const ty=ytop(bx),by2=ybot(bx);
+    const bg2=ctx.createLinearGradient(bx,ty,bx,by2);
+    bg2.addColorStop(0,'transparent');bg2.addColorStop(.5,`rgba(126,207,255,${0.04-band*0.005})`);bg2.addColorStop(1,'transparent');
+    ctx.fillStyle=bg2;ctx.fillRect(bx-1,ty,2,by2-ty);
+  }
+
+  // Big Bang glow
+  const bbg=ctx.createRadialGradient(3,H*.5,0,3,H*.5,36);
+  bbg.addColorStop(0,'rgba(255,210,100,.95)');bbg.addColorStop(.3,'rgba(255,130,55,.5)');bbg.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(3,H*.5,36,0,Math.PI*2);ctx.fillStyle=bbg;ctx.fill();
+  ctx.beginPath();ctx.arc(3,H*.5,5,0,Math.PI*2);ctx.fillStyle='#ffe066';ctx.fill();
+
+  // Galaxies
+  const gdata=[
+    {tx:.18,dy:-.10},{tx:.18,dy:.08},
+    {tx:.36,dy:-.18},{tx:.36,dy:.16},
+    {tx:.54,dy:-.26},{tx:.54,dy:.24},{tx:.54,dy:.01},
+    {tx:.72,dy:-.30},{tx:.72,dy:.28},{tx:.72,dy:-.09},{tx:.72,dy:.10},
+    {tx:.88,dy:-.34},{tx:.88,dy:.32},{tx:.88,dy:-.14},{tx:.88,dy:.14},
+  ];
+  const gcols=['rgba(200,220,255,','rgba(255,222,180,','rgba(200,180,255,','rgba(175,232,200,'];
+  gdata.forEach((gd,i)=>{
+    const x=gd.tx*W,ty2=ytop(x),by2=ybot(x);
+    const mid=(ty2+by2)/2,span=(by2-ty2)/2;
+    const y=mid+gd.dy*span*2.3;
+    if(y<ty2||y>by2)return;
+    const col=gcols[i%gcols.length];
+    const sz=2.4+gd.tx*3.2;
+    ctx.save();ctx.translate(x,y);ctx.rotate(i*.75);
+    const eg=ctx.createRadialGradient(0,0,0,0,0,sz*2.2);
+    eg.addColorStop(0,col+'0.88)');eg.addColorStop(1,'transparent');
+    ctx.scale(1,.44);ctx.beginPath();ctx.arc(0,0,sz*2.2,0,Math.PI*2);ctx.fillStyle=eg;ctx.fill();ctx.restore();
+  });
+
+  // Arrow
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.52,H*.5);ctx.bezierCurveTo(W*.64,H*.5,W*.74,H*.5,W*.95,H*.5);
+  ctx.strokeStyle='rgba(126,207,255,.5)';ctx.lineWidth=1.4;ctx.setLineDash([5,3]);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(W*.95,H*.5);ctx.lineTo(W*.915,H*.5-5);ctx.lineTo(W*.915,H*.5+5);
+  ctx.closePath();ctx.fillStyle='rgba(126,207,255,.7)';ctx.fill();
+  ctx.restore();
+
+  // Deceleration / Acceleration divider line
+  const divX = W * 0.44;
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(divX, ytop(divX)+4);ctx.lineTo(divX, ybot(divX)-4);
+  ctx.strokeStyle='rgba(200,170,255,.28)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+
+  // TODAY marker
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.82,ytop(W*.82)+3);ctx.lineTo(W*.82,ybot(W*.82)-3);
+  ctx.strokeStyle='rgba(200,170,255,.32)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+
+  /* ── IMPROVED LABELS — pill-style chips for legibility ── */
+  function drawChip(text, x, y, color, bgAlpha){
+    const pad = 8, h = 20;
+    ctx.font = `500 11px Share Tech Mono, monospace`;
+    const tw = ctx.measureText(text).width;
+    const rx = tw/2 + pad;
+    // pill background
+    ctx.save();
+    ctx.globalAlpha = bgAlpha;
+    ctx.fillStyle = '#020812';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x-rx, y-h/2, rx*2, h, 6) : ctx.rect(x-rx, y-h/2, rx*2, h);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x-rx, y-h/2, rx*2, h, 6) : ctx.rect(x-rx, y-h/2, rx*2, h);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  // Big Bang label
+  ctx.font='bold 11px Orbitron,monospace';ctx.fillStyle='rgba(255,220,100,.9)';ctx.textAlign='left';
+  ctx.fillText('Big Bang', 7, H*.5-18);
+
+  // Phase labels — positioned in the cone with better contrast
+  drawChip('← Desaceleração', W*0.22, H - 22, 'rgba(255,180,100,0.85)', 0.82);
+  drawChip('Aceleração →', W*0.66, H - 22, 'rgba(126,207,255,0.85)', 0.82);
+
+  // Today label chip
+  drawChip('HOJE', W*0.82, 18, 'rgba(200,170,255,0.85)', 0.82);
+
+  // Phase divider label
+  ctx.save();
+  ctx.font='500 9px Share Tech Mono,monospace';
+  ctx.fillStyle='rgba(200,170,255,0.5)';ctx.textAlign='center';
+  ctx.fillText('~5 Ga', divX, ytop(divX)-8);
+  ctx.restore();
+})();
+
+
+/* ══════════════════════════════════════
+   BLACK HOLE — STANDALONE INTERACTIVE SECTION
+══════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('bh-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, BH_R;
+  let mouse = { x: -9999, y: -9999 };
+  let hover = 0;
+  const PI2 = Math.PI * 2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  // Stars for BH section
+  let STARS = [];
+  function buildStars(){
+    STARS = [];
+    const n = Math.floor(W * H / 400);
+    for(let i = 0; i < n; i++){
+      const m = Math.random();
+      const r = m < 0.01 ? rnd(1.3,2.2) : m < 0.08 ? rnd(0.7,1.3) : rnd(0.1,0.65);
+      STARS.push({x:rnd(0,W), y:rnd(0,H), r, a:rnd(0.3,1), h:Math.random(), tw:rnd(0.4,2.5), ph:rnd(0,PI2)});
+    }
+  }
+
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    W = rect.width;
+    H = rect.height;
+    BH_R = Math.min(W, H) * 0.13;
+    buildStars();
+  }
+
+  function getBHPos() {
+    return { x: W * 0.5, y: H * 0.5 };
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.touches[0].clientX - r.left;
+    mouse.y = e.touches[0].clientY - r.top;
+  }, {passive:false});
+  canvas.addEventListener('touchstart', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.touches[0].clientX - r.left;
+    mouse.y = e.touches[0].clientY - r.top;
+  }, {passive:true});
+  canvas.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  function drawBHBg(){
+    const g = ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,Math.max(W,H)*.7);
+    g.addColorStop(0,'#05091e');g.addColorStop(0.5,'#030712');g.addColorStop(1,'#010208');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+
+  function drawBHStars(t){
+    STARS.forEach(s=>{
+      const {x:bx,y:by}=getBHPos();
+      const dx=s.x-bx, dy=s.y-by;
+      if(dx*dx+dy*dy<BH_R*BH_R*5) return;
+      const fl=0.75+0.25*Math.sin(t*s.tw+s.ph);
+      let col;
+      if(s.h<.15)      col=`rgba(255,248,230,${s.a*fl})`;
+      else if(s.h<.38) col=`rgba(170,215,255,${s.a*fl})`;
+      else if(s.h<.62) col=`rgba(255,255,255,${s.a*fl})`;
+      else if(s.h<.80) col=`rgba(255,235,170,${s.a*fl})`;
+      else             col=`rgba(215,175,255,${s.a*fl})`;
+      if(s.r>1.2){
+        const gw=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6);
+        gw.addColorStop(0,col);gw.addColorStop(1,'transparent');
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*6,0,PI2);ctx.fillStyle=gw;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,PI2);ctx.fillStyle=col;ctx.fill();
+    });
+  }
+
+  function drawBlackHole(t){
+    const {x:bx,y:by} = getBHPos();
+    const R = BH_R;
+
+    const mdx = mouse.x - bx, mdy = mouse.y - by;
+    const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
+    const hoverTarget = mdist < R*10 ? Math.max(0, 1-(mdist/(R*10))) : 0;
+    hover += (hoverTarget - hover) * 0.06;
+    const H2 = hover;
+
+    const diskAngle = t * (0.14 + H2 * 0.32);
+
+    // Outer lensing haze
+    for(let ring=10;ring>0;ring--){
+      const rr=R*(1.9+ring*0.65);
+      const op=(0.022 - ring*0.0015) * (1 + H2*0.6);
+      const g=ctx.createRadialGradient(bx,by,rr*0.82,bx,by,rr*1.15);
+      g.addColorStop(0,'transparent');g.addColorStop(0.5,`rgba(220,235,255,${op})`);g.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(bx,by,rr*1.15,0,PI2);ctx.fillStyle=g;ctx.fill();
+    }
+
+    // Gravitational lensing arcs
+    const arcCount = 120;
+    for(let i=0;i<arcCount;i++){
+      const frac=i/arcCount;
+      const lensR=R*(1.7+frac*6.5);
+      const arcAngle=rnd(0,PI2);
+      const arcSpan=rnd(0.1,0.48)*(1+(1-frac)*0.9);
+      const brightness=(0.5*(1-frac*0.7))*(1+H2*0.45);
+      let col;
+      if(frac<0.15)      col=`rgba(255,200,130,${brightness})`;
+      else if(frac<0.35) col=`rgba(255,240,210,${brightness})`;
+      else if(frac<0.60) col=`rgba(230,235,255,${brightness*0.7})`;
+      else               col=`rgba(180,160,200,${brightness*0.5})`;
+      ctx.save();ctx.translate(bx,by);ctx.scale(1,0.88+frac*0.1);
+      ctx.beginPath();ctx.arc(0,0,lensR,arcAngle,arcAngle+arcSpan);
+      ctx.strokeStyle=col;ctx.lineWidth=Math.max(0.3,(1.5-frac*1.1))*(1+H2*0.3);ctx.stroke();
+      ctx.restore();
+    }
+
+    // Milky Way band arcs
+    for(let seg=0;seg<5;seg++){
+      const segR=R*(2.6+seg*1.3);
+      const startA=Math.PI*0.1+seg*0.08;
+      const spanA=Math.PI*(0.6+seg*0.05);
+      const g2=ctx.createLinearGradient(
+        bx+Math.cos(startA)*segR,by+Math.sin(startA)*segR,
+        bx+Math.cos(startA+spanA)*segR,by+Math.sin(startA+spanA)*segR
+      );
+      const op2=(0.16-seg*0.022)*(1+H2*0.3);
+      g2.addColorStop(0,'transparent');g2.addColorStop(0.3,`rgba(200,215,255,${op2})`);
+      g2.addColorStop(0.7,`rgba(255,230,200,${op2*0.7})`);g2.addColorStop(1,'transparent');
+      ctx.save();ctx.translate(bx,by);ctx.scale(1,0.85);
+      ctx.beginPath();ctx.arc(0,0,segR,startA,startA+spanA);
+      ctx.strokeStyle=g2;ctx.lineWidth=3.2-seg*0.4;ctx.stroke();ctx.restore();
+    }
+
+    // Einstein rings
+    const einsteinRings=[
+      {r:1.50,width:2.4,op:0.92,col:'255,248,230'},
+      {r:1.82,width:1.5,op:0.58,col:'255,235,200'},
+      {r:2.35,width:1.0,op:0.36,col:'220,215,255'},
+      {r:3.30,width:0.7,op:0.22,col:'200,210,255'},
+      {r:5.00,width:0.5,op:0.13,col:'180,195,240'},
+    ];
+    einsteinRings.forEach(er=>{
+      const erR=R*er.r;
+      const glow=ctx.createRadialGradient(bx,by,erR*0.88,bx,by,erR*1.12);
+      const boost=1+H2*0.7;
+      glow.addColorStop(0,'transparent');glow.addColorStop(0.5,`rgba(${er.col},${Math.min(1,er.op*boost)})`);glow.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(bx,by,erR*1.12,0,PI2);ctx.fillStyle=glow;ctx.fill();
+      ctx.beginPath();ctx.arc(bx,by,erR,0,PI2);
+      ctx.strokeStyle=`rgba(${er.col},${Math.min(1,er.op*0.65*boost)})`;
+      ctx.lineWidth=er.width*(1+H2*0.3);ctx.stroke();
+    });
+
+    // Accretion disk
+    ctx.save();ctx.translate(bx,by);ctx.rotate(diskAngle);
+    for(let layer=0;layer<5;layer++){
+      const diskRx=R*(3.4+layer*0.85);const diskRy=diskRx*0.18;
+      const bright=(0.24-layer*0.03)*(1+H2*0.45);
+      const dg=ctx.createRadialGradient(0,0,R*1.2,0,0,diskRx);
+      if(layer===0){
+        dg.addColorStop(0,'transparent');dg.addColorStop(0.25,`rgba(255,160,80,${bright})`);
+        dg.addColorStop(0.6,`rgba(200,80,60,${bright*0.7})`);dg.addColorStop(1,'transparent');
+      } else if(layer<3){
+        dg.addColorStop(0,'transparent');
+        dg.addColorStop(0.4,`rgba(${180+layer*10},${60-layer*8},${80+layer*10},${bright*0.7})`);
+        dg.addColorStop(1,'transparent');
+      } else {
+        dg.addColorStop(0,'transparent');dg.addColorStop(0.5,`rgba(140,50,80,${bright*0.4})`);dg.addColorStop(1,'transparent');
+      }
+      ctx.save();ctx.scale(1,diskRy/diskRx);ctx.beginPath();ctx.ellipse(0,0,diskRx,diskRx,0,0,PI2);ctx.fillStyle=dg;ctx.fill();ctx.restore();
+    }
+    // Inner hot disk
+    const hdg=ctx.createRadialGradient(0,0,R*0.95,0,0,R*2.1);
+    hdg.addColorStop(0,'transparent');hdg.addColorStop(0.3,`rgba(255,255,245,${0.48*(1+H2*0.5)})`);
+    hdg.addColorStop(0.65,`rgba(255,230,140,${0.3*(1+H2*0.4)})`);hdg.addColorStop(1,'transparent');
+    ctx.save();ctx.scale(1,0.16);ctx.beginPath();ctx.ellipse(0,0,R*2.1,R*2.1,0,0,PI2);ctx.fillStyle=hdg;ctx.fill();ctx.restore();
+    ctx.restore();
+
+    // Photon sphere
+    const pR=R*1.5;
+    const pg=ctx.createRadialGradient(bx,by,pR*0.88,bx,by,pR*1.16);
+    pg.addColorStop(0,'transparent');pg.addColorStop(0.35,`rgba(255,248,220,${0.58*(1+H2*0.5)})`);
+    pg.addColorStop(0.65,`rgba(255,215,150,${0.40*(1+H2*0.4)})`);pg.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(bx,by,pR*1.16,0,PI2);ctx.fillStyle=pg;ctx.fill();
+
+    // Relativistic jets
+    for(const sign of [1,-1]){
+      const jetH=R*(7+H2*4);
+      const jg=ctx.createLinearGradient(bx,by,bx,by+sign*jetH);
+      jg.addColorStop(0,`rgba(150,200,255,${0.42+H2*0.22})`);jg.addColorStop(0.35,`rgba(100,160,255,${0.15+H2*0.1})`);
+      jg.addColorStop(0.7,'rgba(80,130,255,0.05)');jg.addColorStop(1,'transparent');
+      ctx.save();ctx.translate(bx,by);
+      ctx.beginPath();ctx.moveTo(-R*.14,0);ctx.quadraticCurveTo(-R*.28,sign*jetH*.5,-R*.42,sign*jetH);
+      ctx.lineTo(R*.42,sign*jetH);ctx.quadraticCurveTo(R*.28,sign*jetH*.5,R*.14,0);ctx.closePath();
+      ctx.fillStyle=jg;ctx.fill();ctx.restore();
+    }
+
+    // Event horizon
+    ctx.beginPath();ctx.arc(bx,by,R,0,PI2);ctx.fillStyle='#000000';ctx.fill();
+    const shadow=ctx.createRadialGradient(bx,by,R*0.82,bx,by,R*1.08);
+    shadow.addColorStop(0,'rgba(0,0,0,1)');shadow.addColorStop(0.75,'rgba(0,0,0,0.85)');shadow.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(bx,by,R*1.08,0,PI2);ctx.fillStyle=shadow;ctx.fill();
+
+    // Labels — larger, clearer
+    if(H2 > 0.08){
+      ctx.save();
+      ctx.globalAlpha = Math.min(1,(H2-0.08)/0.35);
+      // BH label
+      ctx.font=`700 ${Math.max(12,R*.44)}px Share Tech Mono, monospace`;
+      ctx.fillStyle='rgba(126,207,255,0.88)';ctx.textAlign='center';
+      ctx.fillText('BURACO NEGRO', bx, by + R*2.2 + 18);
+      ctx.font=`400 ${Math.max(10,R*.32)}px Share Tech Mono, monospace`;
+      ctx.fillStyle='rgba(200,180,255,0.7)';
+      ctx.fillText('Anéis de Einstein · Lensing Gravitacional', bx, by + R*2.2 + 38);
+      ctx.restore();
+    }
+
+    // Static annotations when hover is low — always visible hints
+    if(H2 < 0.5){
+      const alpha = (0.5 - H2) * 0.9;
+      ctx.save();ctx.globalAlpha=alpha;
+      // Einstein ring annotation
+      ctx.font='500 10px Share Tech Mono,monospace';ctx.fillStyle='rgba(255,248,220,0.7)';ctx.textAlign='left';
+      const erAnnotX = bx + R*1.5 + 8;const erAnnotY = by - 6;
+      ctx.beginPath();ctx.moveTo(bx+R*1.48,by);ctx.lineTo(erAnnotX+2,erAnnotY+6);ctx.strokeStyle='rgba(255,248,220,0.3)';ctx.lineWidth=0.7;ctx.stroke();
+      ctx.fillText('Anel de Einstein', erAnnotX+4, erAnnotY+6);
+      // Disk annotation
+      ctx.fillStyle='rgba(255,180,100,0.7)';
+      const diskAnnotX = bx + R*3.6;const diskAnnotY = by + R*0.22;
+      ctx.fillText('Disco de Acreção', diskAnnotX+4, diskAnnotY);
+      ctx.restore();
+    }
+  }
+
+  let lastT = 0;
+  function animate(ts){
+    requestAnimationFrame(animate);
+    if(prefersReducedMotion) return;
+    const t = ts / 1000;
+    if(t - lastT < 0.033) return; lastT = t;
+    drawBHBg();
+    drawBHStars(t);
+    drawBlackHole(t);
+  }
+
+  const resizeObserver = new ResizeObserver(() => { resize(); });
+  resizeObserver.observe(canvas);
+  resize();
+  requestAnimationFrame(animate);
+})();
+
+/* ── SUPABASE COMMENTS ── */
+(function(){
+  var SB_URL = 'https://nnsglbptlwthqqtaiqsq.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uc2dsYnB0bHd0aHFxdGFpcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjI4ODcsImV4cCI6MjA4OTgzODg4N30.HXKXxGhTCxwQnnbm0_91CYK_emSYWYpIj5PG6VYEbEg';
+  var H = { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY };
+  var list=document.getElementById('cm-list'), btn=document.getElementById('cm-btn'),
+      st=document.getElementById('cm-status'), aut=document.getElementById('cm-autor'),
+      txt=document.getElementById('cm-texto');
+
+  function ago(iso){
+    var d=Math.floor((Date.now()-new Date(iso))/1000);
+    if(d<60) return 'agora mesmo';
+    if(d<3600) return Math.floor(d/60)+' min atrás';
+    if(d<86400) return Math.floor(d/3600)+'h atrás';
+    return Math.floor(d/86400)+'d atrás';
+  }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function render(c, pre){
+    var i=(c.autor||'A').trim()[0].toUpperCase();
+    var el=document.createElement('div'); el.className='comment-card';
+    el.innerHTML='<div class="comment-header"><div class="comment-avatar">'+i+'</div>'
+      +'<span class="comment-autor">'+esc(c.autor||'Anónimo')+'</span>'
+      +'<span class="comment-data">'+ago(c.criado_em)+'</span>'
+      +'<button class="comment-del" title="Eliminar comentário">\u2715 eliminar</button></div>'
+      +'<div class="comment-texto">'+esc(c.texto)+'</div>';
+    var delBtn=el.querySelector('.comment-del'), confirmTimer=null;
+    delBtn.addEventListener('click',function(){
+      if(!delBtn.classList.contains('confirm')){
+        delBtn.classList.add('confirm');
+        delBtn.textContent='\u26a0 tens a certeza?';
+        confirmTimer=setTimeout(function(){
+          delBtn.classList.remove('confirm');
+          delBtn.textContent='\u2715 eliminar';
+        },3000);
+      } else {
+        clearTimeout(confirmTimer);
+        deleteComment(c.id,el);
+      }
+    });
+    if(pre) list.prepend(el); else list.appendChild(el);
+  }
+  async function deleteComment(id,el){
+    try{
+      el.style.opacity='0.4'; el.style.pointerEvents='none';
+      var r=await fetch(SB_URL+'/rest/v1/comentarios?id=eq.'+id,{method:'DELETE',headers:H});
+      if(!r.ok) throw new Error('Erro');
+      el.style.transition='opacity 0.3s,transform 0.3s,max-height 0.4s';
+      el.style.opacity='0'; el.style.transform='translateX(-12px)'; el.style.maxHeight='0';
+      setTimeout(function(){
+        el.remove();
+        if(!list.querySelector('.comment-card')) list.innerHTML='<p class="comments-empty">S\u00ea o primeiro a comentar \u2726</p>';
+      },400);
+    } catch(e){
+      el.style.opacity='1'; el.style.pointerEvents='';
+      show('N\u00e3o foi poss\u00edvel eliminar. Tenta novamente.','err');
+    }
+  }
+  async function load(){
+    list.innerHTML='<div class="comments-spinner"></div>';
+    try{
+      var r=await fetch(SB_URL+'/rest/v1/comentarios?select=*&order=criado_em.desc&limit=50',{headers:H});
+      var d=await r.json(); list.innerHTML='';
+      if(!Array.isArray(d)||!d.length){ list.innerHTML='<p class="comments-empty">Sê o primeiro a comentar ✦</p>'; return; }
+      d.forEach(function(c){ render(c,false); });
+    } catch(e){ list.innerHTML='<p class="comments-empty">Não foi possível carregar os comentários.</p>'; }
+  }
+  async function post(){
+    var a=aut.value.trim()||'Anónimo', t=txt.value.trim();
+    if(!t){ show('Escreve algo antes de publicar.','err'); return; }
+    if(t.length<3){ show('Comentário demasiado curto.','err'); return; }
+    btn.disabled=true; show('A publicar…','');
+    try{
+      var r=await fetch(SB_URL+'/rest/v1/comentarios',{method:'POST',
+        headers:Object.assign({},H,{Prefer:'return=representation'}),
+        body:JSON.stringify({autor:a,texto:t})});
+      var d=await r.json();
+      if(!r.ok) throw new Error(d.message||'Erro');
+      txt.value=''; aut.value=''; show('Publicado! ✦','ok');
+      var e=list.querySelector('.comments-empty'); if(e) e.remove();
+      render(Array.isArray(d)?d[0]:d, true);
+    } catch(e){ show('Erro ao publicar. Tenta novamente.','err');
+    } finally{ btn.disabled=false; }
+  }
+  function show(m,c){
+    st.textContent=m; st.className='comments-status'+(c?' '+c:'');
+    if(c==='ok') setTimeout(function(){st.textContent='';st.className='comments-status';},3500);
+  }
+  btn.addEventListener('click',post);
+  txt.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='Enter')post();});
+  load();
+})();
+
+</script>
+</body>
+</html>
