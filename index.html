@@ -847,6 +847,54 @@ if (!prefersReducedMotion) {
   resize();
   requestAnimationFrame(animate);
 })();
+  (function(){
+  var SB_URL = 'https://nnsglbptlwthqqtaiqsq.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uc2dsYnB0bHd0aHFxdGFpcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjI4ODcsImV4cCI6MjA4OTgzODg4N30.HXKXxGhTCxwQnnbm0_91CYK_emSYWYpIj5PG6VYEbEg';
+
+  var list = document.getElementById('cm-list');
+  var btn = document.getElementById('cm-btn');
+  var st = document.getElementById('cm-status');
+  var aut = document.getElementById('cm-autor');
+  var txt = document.getElementById('cm-texto');
+
+  if (!list || !btn || !txt) return; // evita erro
+
+  var H = {
+    'Content-Type': 'application/json',
+    apikey: SB_KEY,
+    Authorization: 'Bearer ' + SB_KEY
+  };
+
+  function show(m,c){
+    st.textContent = m;
+    st.className = 'comments-status ' + (c||'');
+  }
+
+  function render(c, pre){
+    var el = document.createElement('div');
+    el.className = 'comment-card';
+    el.innerHTML = '<strong>'+(c.autor||'Anónimo')+'</strong><br>'+c.texto;
+    if(pre) list.prepend(el); else list.appendChild(el);
+  }
+
+  async function load(){
+    try{
+      var r = await fetch(SB_URL+'/rest/v1/comentarios?select=*&order=criado_em.desc', {headers:H});
+      var d = await r.json();
+      list.innerHTML='';
+      if(!d.length){ list.innerHTML='<p class="comments-empty">Sê o primeiro a comentar ✦</p>'; return; }
+      d.forEach(c => render(c,false));
+    } catch(e){
+      list.innerHTML='<p class="comments-empty">Erro ao carregar.</p>';
+    }
+  }
+
+  async function post(){
+    var a = aut.value.trim() || 'Anónimo';
+    var t = txt.value.trim();
+
+    if(!t){ show('Escreve algo.','err'); return; }
+})();
 </script>
 </body>
 </html>
