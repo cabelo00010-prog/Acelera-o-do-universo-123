@@ -335,12 +335,411 @@ textarea.comments-input { resize: vertical; min-height: 88px; width: 100%; }
     <div class="stat"><div class="stat-n">Nobel 2011</div><div class="stat-l">Prémio pela descoberta</div></div>
   </div>
 
-  <!-- ── BLACK HOLE INTERACTIVE SECTION ── -->
-  <p class="sec-label reveal">▸ Buraco Negro — Simulação Interativa</p>
-  <div class="bh-section reveal">
-    <span class="bh-section-label">Lensing Gravitacional · Anéis de Einstein · Disco de Acreção</span>
-    <canvas id="bh-canvas"></canvas>
-    <div class="bh-hint">Move o rato / toca para interagir com o buraco negro</div>
+ 
+  <!-- ── COMMENTS SECTION ── -->
+  <p class="sec-label reveal">▸ Comentários</p>
+  <div class="comments-section reveal">
+    <div class="comments-form">
+      <div class="comments-form-row">
+        <input id="cm-autor" class="comments-input" type="text" placeholder="O teu nome (opcional)" maxlength="60">
+        <input id="cm-senha" class="comments-input" type="password" placeholder="Senha para apagar (obrigatório)" maxlength="72">
+        <button id="cm-btn" class="comments-btn">Publicar ✦</button>
+      </div>
+      <textarea id="cm-texto" class="comments-input" placeholder="Deixa um comentário… (Ctrl+Enter para publicar)" maxlength="1000"></textarea>
+      <div id="cm-status" class="comments-status"></div>
+    </div>
+    <div id="cm-list" class="comments-list"></div>
   </div>
 
+  <footer class="reveal">Cosmologia · Aceleração da Expansão do Universo · Energia Escura · ΛCDM · Física Teórica</footer>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   REDUCED MOTION CHECK
+══════════════════════════════════════ */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══════════════════════════════════════
+   SCROLL REVEAL — Intersection Observer
+══════════════════════════════════════ */
+if (!prefersReducedMotion) {
+  const revealEls = document.querySelectorAll('.reveal, .reveal-group');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+} else {
+  // If reduced motion, just make everything visible immediately
+  document.querySelectorAll('.reveal, .reveal-group').forEach(el => el.classList.add('visible'));
+}
+
+/* ══════════════════════════════════════
+   COSMOS BACKGROUND
+══════════════════════════════════════ */
+(function(){
+  if (prefersReducedMotion) return;
+  const c=document.getElementById('cosmos'), ctx=c.getContext('2d');
+  let W,H,STARS=[],BH_X,BH_Y,BH_R;
+  let mouse={x:-9999,y:-9999}, hover=0;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const PI2=Math.PI*2;
+
+  window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  window.addEventListener('touchmove',e=>{
+    if(e.touches.length){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;}
+  },{passive:true});
+  window.addEventListener('touchstart',e=>{
+    if(e.touches.length){mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;}
+  },{passive:true});
+  window.addEventListener('mouseleave',()=>{mouse.x=-9999;mouse.y=-9999;});
+
+  function buildStars(){
+    STARS=[];
+    const n=Math.floor(W*H/520);
+    for(let i=0;i<n;i++){
+      const m=Math.random();
+      const r = m<0.006 ? rnd(1.6,2.8) : m<0.04 ? rnd(1.0,1.6) : m<0.18 ? rnd(0.55,1.0) : rnd(0.08,0.55);
+      const h=Math.random();
+      STARS.push({x:rnd(0,W),y:rnd(0,H),r,a:rnd(0.28,1),h,tw:rnd(0.3,2.8),ph:rnd(0,PI2)});
+    }
+  }
+
+  function drawBg(){
+    const g=ctx.createRadialGradient(W*.45,H*.38,0,W*.45,H*.38,Math.max(W,H)*.95);
+    g.addColorStop(0,'#08102a');g.addColorStop(0.35,'#040b1a');g.addColorStop(0.7,'#020710');g.addColorStop(1,'#010208');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+
+  function drawMilkyWay(){
+    const cx=W*.48, cy=H*.46;
+    const passes=[
+      {rx:W*.68,ry:H*.055,a:-.08,op:0.028,col:'160,168,255'},
+      {rx:W*.60,ry:H*.038,a:-.08,op:0.022,col:'180,185,255'},
+      {rx:W*.50,ry:H*.028,a:-.09,op:0.032,col:'200,205,255'},
+      {rx:W*.72,ry:H*.07,a:-.07,op:0.018,col:'120,130,220'},
+      {rx:W*.80,ry:H*.09,a:-.06,op:0.012,col:'90,100,200'},
+    ];
+    passes.forEach(p=>{
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,p.rx);
+      g.addColorStop(0,`rgba(${p.col},${p.op})`);g.addColorStop(0.5,`rgba(${p.col},${p.op*0.5})`);g.addColorStop(1,'transparent');
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(p.a);ctx.scale(1,p.ry/p.rx);ctx.beginPath();ctx.arc(0,0,p.rx,0,PI2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+    });
+  }
+
+  function drawNebulae(){
+    const nebulae=[
+      {cx:.12,cy:.20,rx:.32,ry:.45,rot:.15,layers:[{col:'20,15,100',op:.18},{col:'40,10,80',op:.10},{col:'10,30,120',op:.08}]},
+      {cx:.82,cy:.62,rx:.36,ry:.44,rot:-.2,layers:[{col:'70,15,85',op:.16},{col:'90,20,60',op:.09},{col:'50,10,100',op:.07}]},
+      {cx:.50,cy:.82,rx:.40,ry:.28,rot:.05,layers:[{col:'15,50,115',op:.14},{col:'10,70,100',op:.08}]},
+      {cx:.92,cy:.10,rx:.22,ry:.26,rot:-.1,layers:[{col:'60,15,80',op:.13},{col:'80,30,50',op:.07}]},
+      {cx:.28,cy:.92,rx:.28,ry:.20,rot:.2,layers:[{col:'8,35,95',op:.12},{col:'15,55,80',op:.06}]},
+      {cx:.55,cy:.35,rx:.55,ry:.50,rot:-.05,layers:[{col:'25,18,90',op:.07},{col:'35,12,70',op:.04}]},
+    ];
+    nebulae.forEach(n=>{
+      n.layers.forEach((l,li)=>{
+        const scale=1-li*.15;
+        const rx=n.rx*W*scale, ry=n.ry*H*scale;
+        const bx=n.cx*W, by=n.cy*H;
+        const g=ctx.createRadialGradient(bx,by,0,bx,by,Math.max(rx,ry));
+        g.addColorStop(0,`rgba(${l.col},${l.op})`);g.addColorStop(0.55,`rgba(${l.col},${l.op*.4})`);g.addColorStop(1,'transparent');
+        ctx.save();ctx.translate(bx,by);ctx.rotate(n.rot);ctx.scale(1,ry/rx);ctx.beginPath();ctx.arc(0,0,rx,0,PI2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      });
+    });
+  }
+
+  function drawStars(t){
+    STARS.forEach(s=>{
+      const dx=s.x-BH_X, dy=s.y-BH_Y;
+      if(dx*dx+dy*dy < BH_R*BH_R*4) return;
+      const fl=0.80+0.20*Math.sin(t*s.tw+s.ph);
+      let col;
+      if(s.h<.10)      col=`rgba(255,248,230,${s.a*fl})`;
+      else if(s.h<.32) col=`rgba(170,215,255,${s.a*fl})`;
+      else if(s.h<.58) col=`rgba(255,255,255,${s.a*fl})`;
+      else if(s.h<.76) col=`rgba(255,235,170,${s.a*fl})`;
+      else if(s.h<.90) col=`rgba(255,190,110,${s.a*fl})`;
+      else             col=`rgba(215,175,255,${s.a*fl})`;
+      if(s.r>1.5){
+        const gw=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);
+        gw.addColorStop(0,col);gw.addColorStop(1,'transparent');
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*8,0,PI2);ctx.fillStyle=gw;ctx.fill();
+        ctx.save();ctx.globalAlpha=s.a*fl*0.28;ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=0.4;
+        const sl=s.r*18;
+        [[s.x-sl,s.y,s.x+sl,s.y],[s.x,s.y-sl,s.x,s.y+sl]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+        ctx.globalAlpha=s.a*fl*0.12;const sd=sl*.65;
+        [[s.x-sd,s.y-sd,s.x+sd,s.y+sd],[s.x+sd,s.y-sd,s.x-sd,s.y+sd]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+        ctx.restore();
+      }
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,PI2);ctx.fillStyle=col;ctx.fill();
+    });
+  }
+
+  function resize(){
+    W=c.width=window.innerWidth; H=c.height=window.innerHeight;
+    BH_X=W*.82; BH_Y=H*.72; BH_R=Math.min(W,H)*.042;
+    buildStars();
+  }
+
+  let lastT=0;
+  function animate(ts){
+    requestAnimationFrame(animate);
+    const t=ts/1000;
+    if(t-lastT<.04)return; lastT=t;
+    drawBg();drawMilkyWay();drawNebulae();drawStars(t);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  requestAnimationFrame(animate);
+})();
+
+
+/* ══════════════════════════════════════
+   DIAGRAM — improved legibility
+══════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('diagram'), ctx=c.getContext('2d');
+  const W=c.width, H=c.height;
+  const eo=t=>1-Math.pow(1-t,3);
+
+  // Background
+  const bg=ctx.createLinearGradient(0,0,W,0);
+  bg.addColorStop(0,'#060918');bg.addColorStop(.5,'#07091c');bg.addColorStop(1,'#050815');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  const CONE_TOP = H * 0.12;
+  const CONE_BOT = H * 0.88;
+  const ytop=x=>H*.5-((H*.5-CONE_TOP))*eo(x/W)*Math.pow(x/W,.28);
+  const ybot=x=>H*.5+((CONE_BOT-H*.5))*eo(x/W)*Math.pow(x/W,.28);
+
+  // Cone fill
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(0,H*.5);
+  for(let x=0;x<=W;x+=4)ctx.lineTo(x,ytop(x));
+  for(let x=W;x>=0;x-=4)ctx.lineTo(x,ybot(x));
+  ctx.closePath();
+  const cf=ctx.createLinearGradient(0,0,W,0);
+  cf.addColorStop(0,'rgba(255,140,80,.22)');cf.addColorStop(.28,'rgba(80,55,175,.13)');
+  cf.addColorStop(.65,'rgba(28,58,158,.10)');cf.addColorStop(1,'rgba(8,28,98,.07)');
+  ctx.fillStyle=cf;ctx.fill();ctx.restore();
+
+  // Cone edges
+  [ytop,ybot].forEach(fn=>{
+    ctx.beginPath();ctx.moveTo(0,H*.5);
+    for(let x=0;x<=W;x+=3)ctx.lineTo(x,fn(x));
+    ctx.strokeStyle='rgba(126,207,255,.22)';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // Bands
+  for(let band=0;band<5;band++){
+    const bx=W*(0.18+band*0.16);
+    const ty=ytop(bx),by2=ybot(bx);
+    const bg2=ctx.createLinearGradient(bx,ty,bx,by2);
+    bg2.addColorStop(0,'transparent');bg2.addColorStop(.5,`rgba(126,207,255,${0.04-band*0.005})`);bg2.addColorStop(1,'transparent');
+    ctx.fillStyle=bg2;ctx.fillRect(bx-1,ty,2,by2-ty);
+  }
+
+  // Big Bang glow
+  const bbg=ctx.createRadialGradient(3,H*.5,0,3,H*.5,36);
+  bbg.addColorStop(0,'rgba(255,210,100,.95)');bbg.addColorStop(.3,'rgba(255,130,55,.5)');bbg.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(3,H*.5,36,0,Math.PI*2);ctx.fillStyle=bbg;ctx.fill();
+  ctx.beginPath();ctx.arc(3,H*.5,5,0,Math.PI*2);ctx.fillStyle='#ffe066';ctx.fill();
+
+  // Galaxies
+  const gdata=[
+    {tx:.18,dy:-.10},{tx:.18,dy:.08},
+    {tx:.36,dy:-.18},{tx:.36,dy:.16},
+    {tx:.54,dy:-.26},{tx:.54,dy:.24},{tx:.54,dy:.01},
+    {tx:.72,dy:-.30},{tx:.72,dy:.28},{tx:.72,dy:-.09},{tx:.72,dy:.10},
+    {tx:.88,dy:-.34},{tx:.88,dy:.32},{tx:.88,dy:-.14},{tx:.88,dy:.14},
+  ];
+  const gcols=['rgba(200,220,255,','rgba(255,222,180,','rgba(200,180,255,','rgba(175,232,200,'];
+  gdata.forEach((gd,i)=>{
+    const x=gd.tx*W,ty2=ytop(x),by2=ybot(x);
+    const mid=(ty2+by2)/2,span=(by2-ty2)/2;
+    const y=mid+gd.dy*span*2.3;
+    if(y<ty2||y>by2)return;
+    const col=gcols[i%gcols.length];
+    const sz=2.4+gd.tx*3.2;
+    ctx.save();ctx.translate(x,y);ctx.rotate(i*.75);
+    const eg=ctx.createRadialGradient(0,0,0,0,0,sz*2.2);
+    eg.addColorStop(0,col+'0.88)');eg.addColorStop(1,'transparent');
+    ctx.scale(1,.44);ctx.beginPath();ctx.arc(0,0,sz*2.2,0,Math.PI*2);ctx.fillStyle=eg;ctx.fill();ctx.restore();
+  });
+
+  // Arrow
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.52,H*.5);ctx.bezierCurveTo(W*.64,H*.5,W*.74,H*.5,W*.95,H*.5);
+  ctx.strokeStyle='rgba(126,207,255,.5)';ctx.lineWidth=1.4;ctx.setLineDash([5,3]);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(W*.95,H*.5);ctx.lineTo(W*.915,H*.5-5);ctx.lineTo(W*.915,H*.5+5);
+  ctx.closePath();ctx.fillStyle='rgba(126,207,255,.7)';ctx.fill();
+  ctx.restore();
+
+  // Deceleration / Acceleration divider line
+  const divX = W * 0.44;
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(divX, ytop(divX)+4);ctx.lineTo(divX, ybot(divX)-4);
+  ctx.strokeStyle='rgba(200,170,255,.28)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+
+  // TODAY marker
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(W*.82,ytop(W*.82)+3);ctx.lineTo(W*.82,ybot(W*.82)-3);
+  ctx.strokeStyle='rgba(200,170,255,.32)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+
+  /* ── IMPROVED LABELS — pill-style chips for legibility ── */
+  function drawChip(text, x, y, color, bgAlpha){
+    const pad = 8, h = 20;
+    ctx.font = `500 11px Share Tech Mono, monospace`;
+    const tw = ctx.measureText(text).width;
+    const rx = tw/2 + pad;
+    // pill background
+    ctx.save();
+    ctx.globalAlpha = bgAlpha;
+    ctx.fillStyle = '#020812';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x-rx, y-h/2, rx*2, h, 6) : ctx.rect(x-rx, y-h/2, rx*2, h);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x-rx, y-h/2, rx*2, h, 6) : ctx.rect(x-rx, y-h/2, rx*2, h);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  // Big Bang label
+  ctx.font='bold 11px Orbitron,monospace';ctx.fillStyle='rgba(255,220,100,.9)';ctx.textAlign='left';
+  ctx.fillText('Big Bang', 7, H*.5-18);
+
+  // Phase labels — positioned in the cone with better contrast
+  drawChip('← Desaceleração', W*0.22, H - 22, 'rgba(255,180,100,0.85)', 0.82);
+  drawChip('Aceleração →', W*0.66, H - 22, 'rgba(126,207,255,0.85)', 0.82);
+
+  // Today label chip
+  drawChip('HOJE', W*0.82, 18, 'rgba(200,170,255,0.85)', 0.82);
+
+  // Phase divider label
+  ctx.save();
+  ctx.font='500 9px Share Tech Mono,monospace';
+  ctx.fillStyle='rgba(200,170,255,0.5)';ctx.textAlign='center';
+  ctx.fillText('~5 Ga', divX, ytop(divX)-8);
+  ctx.restore();
+})();
+
+
+
+/* ── SUPABASE COMMENTS ── */
+(function(){
+  var SB_URL = 'https://nnsglbptlwthqqtaiqsq.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uc2dsYnB0bHd0aHFxdGFpcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjI4ODcsImV4cCI6MjA4OTgzODg4N30.HXKXxGhTCxwQnnbm0_91CYK_emSYWYpIj5PG6VYEbEg';
+  var H = { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY };
+  var list=document.getElementById('cm-list'), btn=document.getElementById('cm-btn'),
+      st=document.getElementById('cm-status'), aut=document.getElementById('cm-autor'),
+      txt=document.getElementById('cm-texto');
+
+  function ago(iso){
+    var d=Math.floor((Date.now()-new Date(iso))/1000);
+    if(d<60) return 'agora mesmo';
+    if(d<3600) return Math.floor(d/60)+' min atrás';
+    if(d<86400) return Math.floor(d/3600)+'h atrás';
+    return Math.floor(d/86400)+'d atrás';
+  }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function render(c, pre){
+    var i=(c.autor||'A').trim()[0].toUpperCase();
+    var el=document.createElement('div'); el.className='comment-card';
+    el.innerHTML='<div class="comment-header"><div class="comment-avatar">'+i+'</div>'
+      +'<span class="comment-autor">'+esc(c.autor||'Anónimo')+'</span>'
+      +'<span class="comment-data">'+ago(c.criado_em)+'</span>'
+      +'<button class="comment-del" title="Eliminar comentário">\u2715 eliminar</button></div>'
+      +'<div class="comment-texto">'+esc(c.texto)+'</div>';
+    var delBtn=el.querySelector('.comment-del'), confirmTimer=null;
+    delBtn.addEventListener('click',function(){
+      if(!delBtn.classList.contains('confirm')){
+        delBtn.classList.add('confirm');
+        delBtn.textContent='\u26a0 tens a certeza?';
+        confirmTimer=setTimeout(function(){
+          delBtn.classList.remove('confirm');
+          delBtn.textContent='\u2715 eliminar';
+        },3000);
+      } else {
+        clearTimeout(confirmTimer);
+        deleteComment(c.id,el);
+      }
+    });
+    if(pre) list.prepend(el); else list.appendChild(el);
+  }
+  async function deleteComment(id,el){
+    var s=prompt('Introduz a senha deste comentário:');
+    if(!s) return;
+    try{
+      el.style.opacity='0.4'; el.style.pointerEvents='none';
+      var r=await fetch(SB_URL+'/rest/v1/rpc/delete_comentario_com_senha',{method:'POST',
+        headers:H, body:JSON.stringify({p_id:id,p_senha:s})});
+      var ok=await r.json();
+      if(!ok) throw new Error('Senha incorreta');
+      el.style.transition='opacity 0.3s,transform 0.3s,max-height 0.4s';
+      el.style.opacity='0'; el.style.transform='translateX(-12px)'; el.style.maxHeight='0';
+      setTimeout(function(){
+        el.remove();
+        if(!list.querySelector('.comment-card')) list.innerHTML='<p class="comments-empty">S\u00ea o primeiro a comentar \u2726</p>';
+      },400);
+    } catch(e){
+      el.style.opacity='1'; el.style.pointerEvents='';
+      show(e.message==='Senha incorreta'?'Senha incorreta \u2717':'N\u00e3o foi poss\u00edvel eliminar. Tenta novamente.','err');
+    }
+  }
+  async function load(){
+    list.innerHTML='<div class="comments-spinner"></div>';
+    try{
+      var r=await fetch(SB_URL+'/rest/v1/comentarios?select=*&order=criado_em.desc&limit=50',{headers:H});
+      var d=await r.json(); list.innerHTML='';
+      if(!Array.isArray(d)||!d.length){ list.innerHTML='<p class="comments-empty">Sê o primeiro a comentar ✦</p>'; return; }
+      d.forEach(function(c){ render(c,false); });
+    } catch(e){ list.innerHTML='<p class="comments-empty">Não foi possível carregar os comentários.</p>'; }
+  }
+  async function post(){
+    var a=aut.value.trim()||'Anónimo', t=txt.value.trim(), s=document.getElementById('cm-senha').value;
+    if(!t){ show('Escreve algo antes de publicar.','err'); return; }
+    if(t.length<3){ show('Comentário demasiado curto.','err'); return; }
+    if(!s||s.length<3){ show('Define uma senha (mínimo 3 caracteres).','err'); return; }
+    btn.disabled=true; show('A publicar…','');
+    try{
+      var r=await fetch(SB_URL+'/rest/v1/rpc/inserir_comentario',{method:'POST',
+        headers:H,
+        body:JSON.stringify({p_autor:a,p_texto:t,p_senha:s})});
+      var d=await r.json();
+      if(!r.ok) throw new Error(d.message||'Erro');
+      txt.value=''; aut.value=''; document.getElementById('cm-senha').value='';
+      show('Publicado! ✦','ok');
+      var e=list.querySelector('.comments-empty'); if(e) e.remove();
+      render(d, true);
+    } catch(e){ show('Erro ao publicar. Tenta novamente.','err');
+    } finally{ btn.disabled=false; }
+  }
+  function show(m,c){
+    st.textContent=m; st.className='comments-status'+(c?' '+c:'');
+    if(c==='ok') setTimeout(function(){st.textContent='';st.className='comments-status';},3500);
+  }
+  btn.addEventListener('click',post);
+  txt.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='Enter')post();});
+  load();
+})();
+
+</script>
+</body>
+</html> 
   
